@@ -10,6 +10,9 @@ const { sequelize } = require("./db");
 const passport = require("passport");
 const passportJWT = require("passport-jwt");
 const User = require("./models/User");
+const UserCtrl = require("./controllers/UserController");
+const authCtrl = require("./controllers/AuthController");
+const router = express.Router();
 
 const app = express();
 app.use(cors());
@@ -21,43 +24,19 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => res.send("Hello World!"));
-
+User.sync();
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
-const createUser = async ({ email, password }) => {
-  return await User.create({ email, password });
-};
+// Routing
 
-const getAllUsers = async () => {
-  return await User.findAll();
-};
+//app.get("/", (req, res) => res.send("Hello World!"));
 
-const getUser = async obj => {
-  return await User.findOne({
-    where: obj
-  });
-};
+// app.post("/users", function(req, res, next) {
+//   UserCtrl.create(req, res);
+// });
 
-let ExtractJwt = passportJWT.ExtractJwt;
+router
+  .route("/auth")
+  .post(authCtrl.authenticate, authCtrl.generateJWT, authCtrl.returnJWT);
 
-let JwtStrategy = passportJWT.Strategy;
-
-let jwtOptions = {};
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-jwtOptions.secretOrKey = process.env.JWT_SECRET_KEY;
-
-app.get("/users", function(req, res) {
-  getAllUsers().then(user => res.json(user));
-});
-
-app.post("/register", function(req, res, next) {
-  const { email, password } = req.body;
-  createUser({ email, password }).then(user =>
-    res.json({ user, msg: "account created succesfully" })
-  );
-});
-
-app.post("login", async function(req, res, next) {
-  const { email, passsword } = req.body;
-});
+app.use("/", router);

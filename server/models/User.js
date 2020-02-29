@@ -5,7 +5,7 @@ const { sequelize, Sequelize } = require("../db");
 const User = sequelize.define("User", {
   id: {
     type: Sequelize.INTEGER,
-    autoIncredment: true,
+    autoIncrement: true,
     primaryKey: true
   },
   email: {
