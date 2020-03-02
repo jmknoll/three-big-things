@@ -26,12 +26,16 @@ async function generateJWT(req, res, next) {
   if (req.dbUser) {
     const jwtPayload = { id: req.dbUser.id };
     const jwtSecret = process.env.JWT_SECRET_KEY;
-    //const jwtData = { expiresIn: parseInt(process.env_JWT_EXP_TIME) };
-    req.token = jwt.sign(jwtPayload, jwtSecret, {});
+    const jwtData = { expiresIn: parseInt(process.env_JWT_EXP_TIME) };
+    req.token = jwt.sign(jwtPayload, jwtSecret, {
+      expiresIn: parseInt(process.env.JWT_EXP_TIME)
+    });
+
     await req.dbUser.update({ refresh_token: uuidv1() }).catch(e => {
       res.status(500).json({ error: e.message });
     });
   }
+  next();
 }
 
 function refreshJWT(req, res, next) {

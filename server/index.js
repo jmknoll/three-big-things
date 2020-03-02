@@ -35,6 +35,8 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 //   UserCtrl.create(req, res);
 // });
 
+router.route("/users").post(UserCtrl.create);
+
 router
   .route("/auth")
   .post(authCtrl.authenticate, authCtrl.generateJWT, authCtrl.returnJWT);
