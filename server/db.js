@@ -10,13 +10,14 @@ const sequelize = new Sequelize(
   }
 );
 
-sequelize
-  .authenticate()
-  .then(function(err) {
-    console.log("Connection has been established successfully.");
-  })
-  .catch(function(err) {
-    console.log("Unable to connect to the database:", err);
-  });
+const db = {};
 
-module.exports = { sequelize, Sequelize };
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+db.users = require("./models/User.js")(sequelize, Sequelize);
+db.goals = require("./models/Goal.js")(sequelize, Sequelize);
+
+db.users.hasMany(db.goals);
+db.goals.belongsTo(db.users);
+
+module.exports = db;

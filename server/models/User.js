@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const uuidv1 = require("uuid/v1");
 const { sequelize, Sequelize } = require("../db");
 
-const User = sequelize.define("User", {
+const User = sequelize.define("users", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,

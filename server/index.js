@@ -9,8 +9,8 @@ const port = process.env.PORT || 8000;
 const { sequelize } = require("./db");
 const passport = require("passport");
 const passportJWT = require("passport-jwt");
-const User = require("./models/User");
-const UserCtrl = require("./controllers/UserController");
+
+const userCtrl = require("./controllers/UserController");
 const authCtrl = require("./controllers/AuthController");
 const router = express.Router();
 
@@ -24,18 +24,9 @@ app.use(
   })
 );
 
-User.sync();
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
-// Routing
-
-//app.get("/", (req, res) => res.send("Hello World!"));
-
-// app.post("/users", function(req, res, next) {
-//   UserCtrl.create(req, res);
-// });
-
-router.route("/users").post(UserCtrl.create);
+router.route("/users").post(userCtrl.create);
 
 router
   .route("/auth")
