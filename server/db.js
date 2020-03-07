@@ -14,10 +14,11 @@ const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
-db.users = require("./models/User.js")(sequelize, Sequelize);
-db.goals = require("./models/Goal.js")(sequelize, Sequelize);
 
-db.users.hasMany(db.goals);
-db.goals.belongsTo(db.users);
+db.User = require("./models/User.js")(sequelize, Sequelize);
+db.Goal = require("./models/Goal.js")(sequelize, Sequelize);
+
+db.User.hasMany(db.Goal);
+db.Goal.belongsTo(db.User);
 
 module.exports = db;

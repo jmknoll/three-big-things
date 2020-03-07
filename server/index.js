@@ -6,9 +6,8 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const port = process.env.PORT || 8000;
-const { sequelize } = require("./db");
 const passport = require("passport");
-const passportJWT = require("passport-jwt");
+const db = require("./db");
 
 const userCtrl = require("./controllers/UserController");
 const authCtrl = require("./controllers/AuthController");
@@ -24,12 +23,14 @@ app.use(
   })
 );
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to three big things." });
+});
 
-router.route("/users").post(userCtrl.create);
+require("./routes")(app);
 
-router
-  .route("/auth")
-  .post(authCtrl.authenticate, authCtrl.generateJWT, authCtrl.returnJWT);
+db.sequelize.sync();
 
-app.use("/", router);
+app.listen(port, () => {
+  console.log("Express listening on port:", port);
+});

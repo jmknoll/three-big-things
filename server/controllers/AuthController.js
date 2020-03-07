@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const uuidv1 = require("uuid/v1");
 
-const User = require("../models/User");
+const db = require("../db");
+const User = db.User;
 
 function authenticate(req, res, next) {
   User.findOne({
@@ -23,10 +24,10 @@ function authenticate(req, res, next) {
 }
 
 async function generateJWT(req, res, next) {
+  console.log("gen");
   if (req.dbUser) {
     const jwtPayload = { id: req.dbUser.id };
     const jwtSecret = process.env.JWT_SECRET_KEY;
-    const jwtData = { expiresIn: parseInt(process.env_JWT_EXP_TIME) };
     req.token = jwt.sign(jwtPayload, jwtSecret, {
       expiresIn: parseInt(process.env.JWT_EXP_TIME)
     });
@@ -55,6 +56,7 @@ function refreshJWT(req, res, next) {
 }
 
 function returnJWT(req, res) {
+  console.log("return");
   if (req.dbUser && req.token) {
     res
       .status(201)
