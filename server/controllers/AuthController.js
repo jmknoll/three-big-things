@@ -24,7 +24,6 @@ function authenticate(req, res, next) {
 }
 
 async function generateJWT(req, res, next) {
-  console.log("gen");
   if (req.dbUser) {
     const jwtPayload = { id: req.dbUser.id };
     const jwtSecret = process.env.JWT_SECRET_KEY;
@@ -56,7 +55,6 @@ function refreshJWT(req, res, next) {
 }
 
 function returnJWT(req, res) {
-  console.log("return");
   if (req.dbUser && req.token) {
     res
       .status(201)

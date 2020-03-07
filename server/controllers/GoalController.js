@@ -1,7 +1,9 @@
 const db = require("../db");
+const jwt = require("jsonwebtoken");
 const Goal = db.Goal;
 
 function create(req, res) {
+  console.log(req.user_id);
   if (!req.body.content) {
     res.status(400).send({
       message: "Content can not be empty!"
@@ -10,7 +12,7 @@ function create(req, res) {
   }
 
   Goal.create({
-    user_id: req.body.user_id,
+    user_id: req.user_id,
     content: req.body.content,
     period: req.body.period
   })
@@ -23,7 +25,11 @@ function create(req, res) {
 }
 
 function findAll(req, res) {
-  Goal.findAll()
+  Goal.findAll({
+    where: {
+      user_id: req.user_id
+    }
+  })
     .then(data => res.status(201).send(data))
     .catch(e => {
       res.status(500).send({ error: e.message });
