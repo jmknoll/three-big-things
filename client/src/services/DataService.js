@@ -31,7 +31,18 @@ const DataService = {
       }
     });
   },
-  createGoal: () => {}
+  createGoal: params => {
+    return axios.post(
+      `${process.env.REACT_APP_BASE_URL}/goals`,
+      { period: "daily", content: params.goal },
+      {
+        headers: {
+          "Content-type": "application/json",
+          "x-access-token": params.token
+        }
+      }
+    );
+  }
 };
 
 export default DataService;
