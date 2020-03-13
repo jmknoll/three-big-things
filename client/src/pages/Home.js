@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../providers/AuthProvider";
 import DataService from "../services/DataService";
+import GoalList from "../components/GoalList";
 
 import localforage from "localforage";
 
@@ -28,7 +29,7 @@ const Goal = styled.div`
 
 const Home = () => {
   const [user, setUser] = useAuth();
-  const [goals, setGoals] = useState([]);
+  let [goals, setGoals] = useState([]);
   const [goal, setGoal] = useState({});
 
   useEffect(() => {
@@ -55,14 +56,20 @@ const Home = () => {
       });
   };
 
+  const removeGoal = goal => {
+    DataService.removeGoal({ token: user.token, goal: goal })
+      .then(res => {
+        setGoals(goals.filter(goal => goal.id !== parseInt(res.data.id)));
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
   return (
     <Container>
       <Text>Goals</Text>
-      {goals.map(goal => (
-        <Goal>
-          <Text>{goal.content}</Text>
-        </Goal>
-      ))}
+      <GoalList goals={goals} removeGoal={removeGoal} />
       <Form>
         <FormField>
           <FormFieldLabel name="password">Email</FormFieldLabel>

@@ -42,6 +42,17 @@ const DataService = {
         }
       }
     );
+  },
+  removeGoal: params => {
+    return axios.delete(
+      `${process.env.REACT_APP_BASE_URL}/goals/${params.goal.id}`,
+      {
+        headers: {
+          "Content-type": "application/json",
+          "x-access-token": params.token
+        }
+      }
+    );
   }
 };
 
