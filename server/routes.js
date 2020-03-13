@@ -35,6 +35,7 @@ module.exports = app => {
 
   router.get("/goals", verifyToken, goalCtrl.findAll);
   router.post("/goals", verifyToken, goalCtrl.create);
+  router.delete("/goals/:id", verifyToken, goalCtrl.destroy);
 
   app.use("/", router);
 };

@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const Goal = db.Goal;
 
 function create(req, res) {
-  console.log(req.user_id);
   if (!req.body.content) {
     res.status(400).send({
       message: "Content can not be empty!"
@@ -36,7 +35,22 @@ function findAll(req, res) {
     });
 }
 
+function destroy(req, res) {
+  Goal.destroy({
+    where: {
+      id: req.params.id
+    }
+  })
+    .then(data => {
+      res.status(200).send({ id: req.params.id });
+    })
+    .catch(e => {
+      res.status(500).send({ error: e.message });
+    });
+}
+
 module.exports = {
   create,
-  findAll
+  findAll,
+  destroy
 };
