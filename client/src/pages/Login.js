@@ -29,7 +29,7 @@ const Login = (props) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [error, setError] = useState(null);
-  const [_, setUser] = useAuth(null);
+  const [user, setUser] = useAuth(null);
 
   const signIn = async (e) => {
     e.preventDefault();

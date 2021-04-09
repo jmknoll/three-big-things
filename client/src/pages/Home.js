@@ -18,8 +18,15 @@ const Container = styled.div`
   padding: 20px 20px;
 `;
 
+const Goal = styled.div`
+  border: 1px solid black;
+  margin: 15px 0;
+  padding: 10px;
+  max-width: 200px;
+`;
+
 const Home = () => {
-  const [user, _] = useAuth();
+  const [user, setUser] = useAuth();
   let [goals, setGoals] = useState([]);
   const [goal, setGoal] = useState({});
 
