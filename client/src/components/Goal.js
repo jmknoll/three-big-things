@@ -1,8 +1,6 @@
 import React from "react";
-import { Box, Button } from "@smooth-ui/core-sc";
+import { Box } from "@smooth-ui/core-sc";
 import styled from "styled-components";
-import DataService from "../services/DataService";
-import { useAuth } from "../providers/AuthProvider";
 
 const ShadowBox = styled(Box)`
   padding: 20px;
@@ -25,7 +23,7 @@ const Close = styled.div`
   right: 5px;
 `;
 
-const Goal = props => {
+const Goal = (props) => {
   return (
     <ShadowBox>
       <Close

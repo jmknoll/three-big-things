@@ -10,7 +10,7 @@ import {
   FormFieldLabel,
   Input,
   Button,
-  Text
+  Text,
 } from "@smooth-ui/core-sc";
 
 const Container = styled.div`
@@ -25,13 +25,13 @@ const ErrorText = styled(Text)`
 `;
 const Header = styled.h1``;
 
-const Login = props => {
+const Login = (props) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [error, setError] = useState(null);
-  const [user, setUser] = useAuth(null);
+  const [_, setUser] = useAuth(null);
 
-  const signIn = async e => {
+  const signIn = async (e) => {
     e.preventDefault();
     setError(null);
     const result = await DataService.signin({ email, password });
@@ -54,7 +54,7 @@ const Login = props => {
             name="email"
             placeholder="you@email.com"
             type="text"
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </FormField>
         <FormField>
@@ -62,12 +62,12 @@ const Login = props => {
           <Input
             name="password"
             type="password"
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </FormField>
         <FormField>{error && <ErrorText>{error}</ErrorText>}</FormField>
         <FormField row scale="lg">
-          <Button onClick={e => signIn(e)} type="submit">
+          <Button onClick={(e) => signIn(e)} type="submit">
             Submit
           </Button>
         </FormField>
