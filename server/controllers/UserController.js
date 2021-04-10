@@ -1,6 +1,20 @@
 const db = require("../models");
 const User = db.User;
 
+async function me(req, res) {
+  try {
+    const user = await User.findOne({
+      where: {
+        id: req.user_id,
+      },
+      attributes: ["id", "name", "email", "refresh_token"],
+    });
+    res.status(201).send(user);
+  } catch (e) {
+    res.status(500).send({ error: e.message || "Error fetching user" });
+  }
+}
+
 function create(req, res) {
   if (!req.body) {
     res.status(400).send({
@@ -22,5 +36,6 @@ function create(req, res) {
 }
 
 module.exports = {
+  me,
   create,
 };

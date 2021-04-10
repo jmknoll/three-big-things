@@ -24,6 +24,8 @@ module.exports = (app) => {
     });
   }
 
+  router.get("/me", verifyToken, userCtrl.me);
+
   router.post("/users", userCtrl.create);
 
   router.post(
