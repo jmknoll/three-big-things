@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const uuidv1 = require("uuid/v1");
 const { OAuth2Client } = require("google-auth-library");
 
-const db = require("../db");
+const db = require("../models");
 const User = db.User;
 
 async function oauth(req, res, next) {

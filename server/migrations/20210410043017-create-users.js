@@ -1,10 +1,9 @@
-const bcrypt = require("bcrypt");
+"use strict";
 const uuidv1 = require("uuid/v1");
 
-module.exports = (sequelize, Sequelize) => {
-  const User = sequelize.define(
-    "User",
-    {
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable("users", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -35,25 +34,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         defaultValue: uuidv1(),
       },
-    },
-    {
-      underscored: true,
-    }
-  );
+    });
+  },
 
-  User.associate = (models) => {
-    User.hasMany(models.Goal, { as: "goals", foreignKey: "UserId" });
-  };
-
-  User.beforeCreate((user) => {
-    const hash = bcrypt.hashSync(user.password, 10);
-    user.password = hash;
-    user.refresh_token = uuidv1();
-  });
-
-  User.prototype.comparePassword = function (somePassword) {
-    return bcrypt.compareSync(somePassword, this.password);
-  };
-
-  return User;
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable("users");
+  },
 };
