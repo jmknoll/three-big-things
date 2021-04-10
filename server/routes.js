@@ -2,7 +2,6 @@ module.exports = (app) => {
   const userCtrl = require("./controllers/UserController");
   const authCtrl = require("./controllers/AuthController");
   const goalCtrl = require("./controllers/GoalController");
-  const oauthCtrl = require("./controllers/OAuthController");
   const jwt = require("jsonwebtoken");
 
   var router = require("express").Router();
@@ -34,7 +33,12 @@ module.exports = (app) => {
     authCtrl.returnJWT
   );
 
-  router.post("/oauth", authCtrl.oauth);
+  router.post(
+    "/oauth",
+    authCtrl.oauth,
+    authCtrl.generateJWT,
+    authCtrl.returnJWT
+  );
 
   router.get("/goals", verifyToken, goalCtrl.findAll);
   router.post("/goals", verifyToken, goalCtrl.create);

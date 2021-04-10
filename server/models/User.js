@@ -45,11 +45,12 @@ module.exports = (sequelize, Sequelize) => {
     User.hasMany(models.Goal, { as: "goals", foreignKey: "UserId" });
   };
 
-  User.beforeCreate((user) => {
-    const hash = bcrypt.hashSync(user.password, 10);
-    user.password = hash;
-    user.refresh_token = uuidv1();
-  });
+  // Removing email/password signup temporarily
+  // User.beforeCreate((user) => {
+  //   const hash = bcrypt.hashSync(user.password, 10);
+  //   user.password = hash;
+  //   user.refresh_token = uuidv1();
+  // });
 
   User.prototype.comparePassword = function (somePassword) {
     return bcrypt.compareSync(somePassword, this.password);

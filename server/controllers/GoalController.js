@@ -1,5 +1,4 @@
 const db = require("../models");
-const jwt = require("jsonwebtoken");
 const Goal = db.Goal;
 
 function create(req, res) {

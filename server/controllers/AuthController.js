@@ -15,17 +15,23 @@ async function oauth(req, res, next) {
     });
     const { name, email } = ticket.getPayload();
 
-    const user = { name, email };
-    res.status(201);
-    res.json(user);
+    const user = await User.findOrCreate({
+      where: {
+        email,
+      },
+      defaults: {
+        email,
+        name,
+      },
+      attributes: ["id", "name", "email", "refresh_token"],
+    });
+
+    req.dbUser = user[0];
+
+    next();
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-
-  // const user = await User.upsert({
-  //     where: { email: email },
-  //     create: { name, email }
-  // })
 }
 
 function authenticate(req, res, next) {
@@ -53,10 +59,6 @@ async function generateJWT(req, res, next) {
     const jwtSecret = process.env.JWT_SECRET_KEY;
     req.token = jwt.sign(jwtPayload, jwtSecret, {
       expiresIn: parseInt(process.env.JWT_EXP_TIME),
-    });
-
-    await req.dbUser.update({ refresh_token: uuidv1() }).catch((e) => {
-      res.status(500).json({ error: e.message });
     });
   }
   next();
