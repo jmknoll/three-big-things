@@ -1,4 +1,4 @@
-module.exports = app => {
+module.exports = (app) => {
   const userCtrl = require("./controllers/UserController");
   const authCtrl = require("./controllers/AuthController");
   const goalCtrl = require("./controllers/GoalController");
@@ -16,7 +16,7 @@ module.exports = app => {
     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
       if (err) {
         return res.status(401).send({
-          message: "Unauthorized!"
+          message: "Unauthorized!",
         });
       }
       req.user_id = decoded.id;
@@ -24,11 +24,20 @@ module.exports = app => {
     });
   }
 
+  router.get("/me", verifyToken, userCtrl.me);
+
   router.post("/users", userCtrl.create);
 
   router.post(
     "/auth",
     authCtrl.authenticate,
+    authCtrl.generateJWT,
+    authCtrl.returnJWT
+  );
+
+  router.post(
+    "/oauth",
+    authCtrl.oauth,
     authCtrl.generateJWT,
     authCtrl.returnJWT
   );

@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import GoogleLogin from "react-google-login";
 import { withRouter } from "react-router-dom";
+
 import { useAuth } from "../providers/AuthProvider";
 import DataService from "../services/DataService";
 
@@ -44,6 +46,11 @@ const Login = (props) => {
     }
   };
 
+  const handleLogin = async (googleData) => {
+    const result = await DataService.oauth({ token: googleData.tokenId });
+    console.log(result);
+  };
+
   return (
     <Container>
       <Header>Sign In</Header>
@@ -71,6 +78,13 @@ const Login = (props) => {
             Submit
           </Button>
         </FormField>
+        <GoogleLogin
+          clientId={process.env.REACT_APP_GAPI_CLIENT_ID}
+          buttonText="Log in with Google"
+          onSuccess={handleLogin}
+          onFailure={handleLogin}
+          cookiePolicy={"single_host_origin"}
+        />
       </Form>
     </Container>
   );

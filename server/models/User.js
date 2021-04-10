@@ -3,47 +3,56 @@ const uuidv1 = require("uuid/v1");
 
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define(
-    "users",
+    "User",
     {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
-        primaryKey: true
+        primaryKey: true,
+      },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       email: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: {
           args: true,
-          msg: "Username already exists"
-        }
+          msg: "Username already exists",
+        },
       },
       password: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true,
       },
       refresh_token: {
         type: Sequelize.UUID,
-        allowNull: false,
+        allowNull: true,
         unique: {
           args: true,
-          msg: "Bad luck. Refresh token already exists"
+          msg: "Bad luck. Refresh token already exists",
         },
-        defaultValue: uuidv1()
-      }
+        defaultValue: uuidv1(),
+      },
     },
     {
-      underscored: true
+      underscored: true,
     }
   );
 
-  User.beforeCreate(user => {
-    const hash = bcrypt.hashSync(user.password, 10);
-    user.password = hash;
-    user.refresh_token = uuidv1();
-  });
+  User.associate = (models) => {
+    User.hasMany(models.Goal, { as: "goals", foreignKey: "UserId" });
+  };
 
-  User.prototype.comparePassword = function(somePassword) {
+  // Removing email/password signup temporarily
+  // User.beforeCreate((user) => {
+  //   const hash = bcrypt.hashSync(user.password, 10);
+  //   user.password = hash;
+  //   user.refresh_token = uuidv1();
+  // });
+
+  User.prototype.comparePassword = function (somePassword) {
     return bcrypt.compareSync(somePassword, this.password);
   };
 

@@ -1,15 +1,12 @@
-module.exports = (sequelize, Sequelize) => {
-  const Goal = sequelize.define(
-    "Goal",
-    {
+"use strict";
+
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable("goals", {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-      },
-      user_id: {
-        type: Sequelize.UUID,
-        allowNull: false,
       },
       content: {
         type: Sequelize.TEXT,
@@ -19,10 +16,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         required: true,
       },
-    },
-    {
-      underscored: true,
-    }
-  );
-  return Goal;
+    });
+  },
+
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable("goals");
+  },
 };
