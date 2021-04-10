@@ -16,10 +16,7 @@ const dbConfig = {
 
 const sslOptions = {
   dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
+    ssl: true,
   },
 };
 
@@ -34,6 +31,7 @@ module.exports = {
     ...sslOptions,
   },
   production: {
+    use_env_variable: "DATABASE_URL",
     ...dbConfig,
     ...sslOptions,
   },
