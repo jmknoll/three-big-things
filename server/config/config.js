@@ -14,6 +14,8 @@ const dbConfig = {
   dialect: "postgres",
 };
 
+console.log(dbConfig);
+
 const sslOptions = {
   dialectOptions: {
     ssl: true,
