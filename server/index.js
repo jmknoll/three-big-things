@@ -19,7 +19,7 @@ app.use(passport.initialize());
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
-    extended: false
+    extended: false,
   })
 );
 

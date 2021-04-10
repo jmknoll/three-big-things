@@ -1,7 +1,8 @@
-module.exports = app => {
+module.exports = (app) => {
   const userCtrl = require("./controllers/UserController");
   const authCtrl = require("./controllers/AuthController");
   const goalCtrl = require("./controllers/GoalController");
+  const oauthCtrl = require("./controllers/OAuthController");
   const jwt = require("jsonwebtoken");
 
   var router = require("express").Router();
@@ -16,7 +17,7 @@ module.exports = app => {
     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
       if (err) {
         return res.status(401).send({
-          message: "Unauthorized!"
+          message: "Unauthorized!",
         });
       }
       req.user_id = decoded.id;
@@ -32,6 +33,8 @@ module.exports = app => {
     authCtrl.generateJWT,
     authCtrl.returnJWT
   );
+
+  router.post("/oauth", authCtrl.oauth);
 
   router.get("/goals", verifyToken, goalCtrl.findAll);
   router.post("/goals", verifyToken, goalCtrl.create);
