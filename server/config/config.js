@@ -24,6 +24,7 @@ module.exports = {
     ...dbConfig,
   },
   production: {
+    use_env_variable: "DATABASE_URL",
     dialectOptions: {
       ssl: {
         require: true,
