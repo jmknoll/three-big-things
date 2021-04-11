@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import GoogleLogin from "react-google-login";
-import { withRouter } from "react-router-dom";
+import { withRouter, Redirect } from "react-router-dom";
 
 import { useAuth } from "../providers/AuthProvider";
 import DataService from "../services/DataService";
@@ -14,6 +14,8 @@ import {
   Button,
   Text,
 } from "@smooth-ui/core-sc";
+
+const dataService = new DataService();
 
 const Container = styled.div`
   display: flex;
@@ -31,28 +33,19 @@ const Login = (props) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [error, setError] = useState(null);
-  const [user, setUser] = useAuth(null);
-
-  const signIn = async (e) => {
-    e.preventDefault();
-    setError(null);
-    const result = await DataService.signin({ email, password });
-    if (result && result.user) {
-      result.user["token"] = result.token;
-      setUser(result.user);
-      props.history.push("/home");
-    } else {
-      setError("Invalid username or password");
-    }
-  };
+  const { state, dispatch } = useAuth(null);
 
   const handleLogin = async (googleData) => {
-    const result = await DataService.oauth({ token: googleData.tokenId });
-    console.log(result);
+    const result = await dataService.oauth({ token: googleData.tokenId });
+    dispatch({
+      type: "LOGIN",
+      payload: { user: result.user, token: result.token },
+    });
   };
 
   return (
     <Container>
+      {state.isAuthenticated ? <Redirect to="home" /> : null}
       <Header>Sign In</Header>
       <Form>
         <FormField>
@@ -74,9 +67,7 @@ const Login = (props) => {
         </FormField>
         <FormField>{error && <ErrorText>{error}</ErrorText>}</FormField>
         <FormField row scale="lg">
-          <Button onClick={(e) => signIn(e)} type="submit">
-            Submit
-          </Button>
+          <Button type="submit">Submit</Button>
         </FormField>
         <GoogleLogin
           clientId={process.env.REACT_APP_GAPI_CLIENT_ID}

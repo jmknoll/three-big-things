@@ -1,17 +1,14 @@
 import axios from "axios";
 
-const DataService = {
-  signup: (params) => {
-    console.log(params);
-  },
-
-  signin: (params) => {
+class DataService {
+  signin(params) {
+    const { email, password } = params;
     return axios
       .post(
         `${process.env.REACT_APP_BASE_URL}/auth`,
         {
-          email: params.email,
-          password: params.password,
+          email,
+          password,
         },
         {
           headers: { "Content-type": "application/json" },
@@ -23,9 +20,9 @@ const DataService = {
       .catch((err) => {
         return err;
       });
-  },
+  }
 
-  oauth: (params) => {
+  oauth(params) {
     const { token } = params;
     return axios
       .post(
@@ -45,17 +42,35 @@ const DataService = {
       .catch((err) => {
         return err;
       });
-  },
+  }
 
-  getGoals: (params) => {
+  fetchUser(params) {
+    const { token } = params;
+    return axios
+      .get(`${process.env.REACT_APP_BASE_URL}/me`, {
+        headers: {
+          "Content-type": "application/json",
+          "x-access-token": token,
+        },
+      })
+      .then((res) => {
+        return [res.data, null];
+      })
+      .catch((err) => {
+        return [null, err];
+      });
+  }
+
+  fetchGoals(params) {
     return axios.get(`${process.env.REACT_APP_BASE_URL}/goals`, {
       headers: {
         "Content-type": "application/json",
         "x-access-token": params.token,
       },
     });
-  },
-  createGoal: (params) => {
+  }
+
+  createGoal(params) {
     return axios.post(
       `${process.env.REACT_APP_BASE_URL}/goals`,
       { period: "daily", content: params.goal },
@@ -66,8 +81,9 @@ const DataService = {
         },
       }
     );
-  },
-  removeGoal: (params) => {
+  }
+
+  removeGoal(params) {
     return axios.delete(
       `${process.env.REACT_APP_BASE_URL}/goals/${params.goal.id}`,
       {
@@ -77,7 +93,7 @@ const DataService = {
         },
       }
     );
-  },
-};
+  }
+}
 
 export default DataService;

@@ -1,7 +1,7 @@
 const db = require("../models");
 const User = db.User;
 
-async function me(req, res) {
+async function me(req, res, next) {
   try {
     const user = await User.findOne({
       where: {
@@ -9,7 +9,8 @@ async function me(req, res) {
       },
       attributes: ["id", "name", "email", "refresh_token"],
     });
-    res.status(201).send(user);
+    req.dbUser = user;
+    next();
   } catch (e) {
     res.status(500).send({ error: e.message || "Error fetching user" });
   }

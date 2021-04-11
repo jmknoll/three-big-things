@@ -1,11 +1,17 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 
 import Layout from "./pages/Layout";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import NoMatch from "./pages/404";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import { AuthProvider } from "./providers/AuthProvider";
 
@@ -17,12 +23,15 @@ function App() {
       <AuthProvider>
         <Router>
           <Switch>
-            <Route path="/signin">
+            <Route path="/" exact>
+              <Redirect to="/home" />
+            </Route>
+            <Route path="/login">
               <Login />
             </Route>
-            <Route path="/home">
+            <ProtectedRoute path="/home">
               <Home />
-            </Route>
+            </ProtectedRoute>
             <Route path="*">
               <NoMatch />
             </Route>

@@ -14,6 +14,8 @@ import {
   Text,
 } from "@smooth-ui/core-sc";
 
+const dataService = new DataService();
+
 const Container = styled.div`
   padding: 20px 20px;
 `;
@@ -26,13 +28,14 @@ const Goal = styled.div`
 `;
 
 const Home = () => {
-  const [user, setUser] = useAuth();
+  const [user, setUser] = useState();
   let [goals, setGoals] = useState([]);
   const [goal, setGoal] = useState({});
 
   useEffect(() => {
     if (user && user.token) {
-      DataService.getGoals({ token: user.token })
+      dataService
+        .fetchGoals({ token: user.token })
         .then((res) => {
           setGoals(res.data);
         })
@@ -44,7 +47,8 @@ const Home = () => {
 
   const addGoal = (e) => {
     e.preventDefault();
-    DataService.createGoal({ token: user.token, goal })
+    dataService
+      .createGoal({ token: user.token, goal })
       .then((res) => {
         setGoals([...goals, res.data]);
         setGoal({ content: "" });
@@ -55,7 +59,8 @@ const Home = () => {
   };
 
   const removeGoal = (goal) => {
-    DataService.removeGoal({ token: user.token, goal: goal })
+    dataService
+      .removeGoal({ token: user.token, goal: goal })
       .then((res) => {
         setGoals(goals.filter((goal) => goal.id !== parseInt(res.data.id)));
       })
