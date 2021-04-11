@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../providers/AuthProvider";
 import DataService from "../services/DataService";
 import GoalList from "../components/GoalList";
+import Navbar from "../components/Navbar";
 
 import styled from "styled-components";
 
@@ -69,27 +70,30 @@ const Home = () => {
   };
 
   return (
-    <Container>
-      <Text>Goals</Text>
-      <GoalList goals={goals} removeGoal={removeGoal} />
-      <Form>
-        <FormField>
-          <FormFieldLabel name="password">Email</FormFieldLabel>
-          <Input
-            name="Add Goal"
-            placeholder="One big thing"
-            type="text"
-            onChange={(e) => setGoal(e.target.value)}
-            value={goal.content}
-          />
-        </FormField>
-        <FormField row scale="lg">
-          <Button onClick={(e) => addGoal(e)} type="submit">
-            Submit
-          </Button>
-        </FormField>
-      </Form>
-    </Container>
+    <>
+      <Navbar />
+      <Container>
+        <Text>Goals</Text>
+        <GoalList goals={goals} removeGoal={removeGoal} />
+        <Form>
+          <FormField>
+            <FormFieldLabel name="password">Email</FormFieldLabel>
+            <Input
+              name="Add Goal"
+              placeholder="One big thing"
+              type="text"
+              onChange={(e) => setGoal(e.target.value)}
+              value={goal.content}
+            />
+          </FormField>
+          <FormField row scale="lg">
+            <Button onClick={(e) => addGoal(e)} type="submit">
+              Submit
+            </Button>
+          </FormField>
+        </Form>
+      </Container>
+    </>
   );
 };
 
