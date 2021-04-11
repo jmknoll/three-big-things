@@ -36,11 +36,15 @@ const Login = (props) => {
   const { state, dispatch } = useAuth(null);
 
   const handleLogin = async (googleData) => {
-    const result = await dataService.oauth({ token: googleData.tokenId });
-    dispatch({
-      type: "LOGIN",
-      payload: { user: result.user, token: result.token },
+    const [result, error] = await dataService.oauth({
+      token: googleData.tokenId,
     });
+    if (result) {
+      dispatch({
+        type: "LOGIN",
+        payload: { user: result.user, token: result.token },
+      });
+    }
   };
 
   return (

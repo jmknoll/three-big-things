@@ -28,27 +28,26 @@ const Goal = styled.div`
 `;
 
 const Home = () => {
-  const [user, setUser] = useState();
+  const { state } = useAuth();
+  const { user, token } = state;
   let [goals, setGoals] = useState([]);
   const [goal, setGoal] = useState({});
 
   useEffect(() => {
-    if (user && user.token) {
-      dataService
-        .fetchGoals({ token: user.token })
-        .then((res) => {
-          setGoals(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [user]);
+    dataService
+      .fetchGoals({ token: token })
+      .then((res) => {
+        setGoals(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [false]);
 
   const addGoal = (e) => {
     e.preventDefault();
     dataService
-      .createGoal({ token: user.token, goal })
+      .createGoal({ token, goal })
       .then((res) => {
         setGoals([...goals, res.data]);
         setGoal({ content: "" });

@@ -20,7 +20,6 @@ const initialState = {
 };
 
 const reducer = (state, action) => {
-  console.log("running action", action);
   switch (action.type) {
     case "LOGIN":
       localStorage.setItem("user", JSON.stringify(action.payload.user));

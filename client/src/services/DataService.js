@@ -36,12 +36,8 @@ class DataService {
           },
         }
       )
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => {
-        return err;
-      });
+      .then((res) => [res.data, null])
+      .catch((err) => [null, err]);
   }
 
   fetchUser(params) {
@@ -53,12 +49,8 @@ class DataService {
           "x-access-token": token,
         },
       })
-      .then((res) => {
-        return [res.data, null];
-      })
-      .catch((err) => {
-        return [null, err];
-      });
+      .then((res) => [res.data, null])
+      .catch((err) => [null, err]);
   }
 
   fetchGoals(params) {
