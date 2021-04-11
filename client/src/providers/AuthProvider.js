@@ -1,5 +1,7 @@
-import React, { useEffect } from "react";
-import localforage from "localforage";
+import React, { useEffect, useReducer } from "react";
+import ProtectedRoute from "../components/ProtectedRoute";
+import DataService from "../services/DataService";
+const dataService = new DataService();
 
 const AuthContext = React.createContext();
 
@@ -11,27 +13,68 @@ function useAuth() {
   return context;
 }
 
+const initialState = {
+  isAuthenticated: false,
+  user: null,
+  token: null,
+};
+
+const reducer = (state, action) => {
+  console.log("running reducer", action);
+  switch (action.type) {
+    case "LOGIN":
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem("token", JSON.stringify(action.payload.token));
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload.user,
+        token: action.payload.token,
+      };
+    case "LOGOUT":
+      localStorage.clear();
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: null,
+        token: null,
+      };
+    default:
+      return state;
+  }
+};
+
 function AuthProvider(props) {
-  const [user, setUser] = React.useState(null);
-  const value = React.useMemo(() => [user, setUser], [user]);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    localforage
-      .getItem("user")
-      .then(user => {
-        setUser(user);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }, []);
+    fetchUser();
+  }, [false]);
 
-  if (user && user.token) {
-    localforage.setItem("token", user.token);
-    localforage.setItem("user", user);
-  }
+  const fetchUser = async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const [result, error] = await dataService.fetchUser({ token });
+      if (result) {
+        dispatch({
+          type: "LOGIN",
+          payload: { user: result.user, token: result.token },
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-  return <AuthContext.Provider value={value} {...props} />;
+  return (
+    <AuthContext.Provider
+      value={{
+        state,
+        dispatch,
+      }}
+      {...props}
+    />
+  );
 }
 
 export { AuthProvider, useAuth };

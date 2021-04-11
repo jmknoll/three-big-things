@@ -24,7 +24,13 @@ module.exports = (app) => {
     });
   }
 
-  router.get("/me", verifyToken, userCtrl.me);
+  router.get(
+    "/me",
+    verifyToken,
+    userCtrl.me,
+    authCtrl.generateJWT,
+    authCtrl.returnJWT
+  );
 
   router.post("/users", userCtrl.create);
 
