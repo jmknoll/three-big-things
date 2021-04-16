@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const uuidv1 = require("uuid/v1");
 const { OAuth2Client } = require("google-auth-library");
 
 const db = require("../models");

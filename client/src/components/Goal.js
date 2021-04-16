@@ -1,8 +1,7 @@
 import React from "react";
-import { Box } from "@smooth-ui/core-sc";
 import styled from "styled-components";
 
-const ShadowBox = styled(Box)`
+const ShadowBox = styled.div`
   padding: 20px;
   border;
   background: #fff;

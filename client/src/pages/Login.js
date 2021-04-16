@@ -7,33 +7,40 @@ import { useAuth } from "../providers/AuthProvider";
 import DataService from "../services/DataService";
 
 import {
-  Form,
-  FormField,
-  FormFieldLabel,
-  Input,
+  TextField,
   Button,
-  Text,
-} from "@smooth-ui/core-sc";
+  FormControl,
+  InputLabel,
+  Input,
+  Container,
+  Paper,
+} from "@material-ui/core";
+
+import { withTheme } from "@material-ui/core/styles";
 
 const dataService = new DataService();
 
-const Container = styled.div`
+const Page = withTheme(styled.div`
+  background-color: ${(props) => props.theme.palette.primary.main};
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  height: 100vh;
+  padding-top: 75px;
+`);
+
+const StyledPaper = styled(Paper)`
+  padding: 30px;
 `;
 
-const ErrorText = styled(Text)`
-  color: rgb(189, 73, 50);
-`;
-const Header = styled.h1``;
+const Card = styled.div``;
 
 const Login = (props) => {
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
   const [error, setError] = useState(null);
+
   const { state, dispatch } = useAuth(null);
+  const { isAuthenticated } = state;
 
   const handleLogin = async (googleData) => {
     const [result, error] = await dataService.oauth({
@@ -48,40 +55,43 @@ const Login = (props) => {
   };
 
   return (
-    <Container>
-      {state.isAuthenticated ? <Redirect to="home" /> : null}
-      <Header>Sign In</Header>
-      <Form>
-        <FormField>
-          <FormFieldLabel name="password">Email</FormFieldLabel>
-          <Input
-            name="email"
-            placeholder="you@email.com"
-            type="text"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </FormField>
-        <FormField>
-          <FormFieldLabel name="password">Password</FormFieldLabel>
-          <Input
-            name="password"
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </FormField>
-        <FormField>{error && <ErrorText>{error}</ErrorText>}</FormField>
-        <FormField row scale="lg">
-          <Button type="submit">Submit</Button>
-        </FormField>
-        <GoogleLogin
-          clientId={process.env.REACT_APP_GAPI_CLIENT_ID}
-          buttonText="Log in with Google"
-          onSuccess={handleLogin}
-          onFailure={handleLogin}
-          cookiePolicy={"single_host_origin"}
+    <Page>
+      <Container maxWidth="lg">
+        {isAuthenticated ? <Redirect to="home" /> : null}
+
+        {/* REMOVING EMAIL/PASSWORD LOGIN TEMPORARILY
+        <TextField
+          name="email"
+          label="Email"
+          variant="outlined"
+          onChange={(e) => setEmail(e.target.value)}
         />
-      </Form>
-    </Container>
+
+        <TextField
+          name="password"
+          type="password"
+          label="password"
+          variant="outlined"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <FormControl>{error && <ErrorText>{error}</ErrorText>}</FormControl>
+        <FormControl row scale="lg">
+          <Button variant="contained" color="primary">
+            Submit
+          </Button>
+        </FormControl> */}
+        <StyledPaper>
+          <GoogleLogin
+            clientId={process.env.REACT_APP_GAPI_CLIENT_ID}
+            buttonText="Log in with Google"
+            onSuccess={handleLogin}
+            onFailure={handleLogin}
+            cookiePolicy={"single_host_origin"}
+          />
+        </StyledPaper>
+      </Container>
+    </Page>
   );
 };
 

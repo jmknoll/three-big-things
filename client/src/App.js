@@ -5,7 +5,10 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import { ThemeProvider } from "styled-components";
+import { MuiThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
+
+import theme from "./ui/theme";
 
 import Layout from "./pages/Layout";
 import Login from "./pages/Login";
@@ -15,30 +18,31 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import { AuthProvider } from "./providers/AuthProvider";
 
-import { theme } from "@smooth-ui/core-sc";
-
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
       <AuthProvider>
         <Router>
-          <Switch>
-            <Route path="/" exact>
-              <Redirect to="/home" />
-            </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <ProtectedRoute path="/home">
-              <Home />
-            </ProtectedRoute>
-            <Route path="*">
-              <NoMatch />
-            </Route>
-          </Switch>
+          <Layout>
+            <Switch>
+              <Route path="/" exact>
+                <Redirect to="/home" />
+              </Route>
+              <Route path="/login">
+                <Login />
+              </Route>
+              <ProtectedRoute path="/home">
+                <Home />
+              </ProtectedRoute>
+              <Route path="*">
+                <NoMatch />
+              </Route>
+            </Switch>
+          </Layout>
         </Router>
       </AuthProvider>
-    </ThemeProvider>
+    </MuiThemeProvider>
   );
 }
 

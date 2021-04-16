@@ -7,25 +7,17 @@ import Navbar from "../components/Navbar";
 import styled from "styled-components";
 
 import {
-  Form,
-  FormField,
-  FormFieldLabel,
+  FormControl,
+  InputLabel,
   Input,
+  TextField,
   Button,
-  Text,
-} from "@smooth-ui/core-sc";
+} from "@material-ui/core";
 
 const dataService = new DataService();
 
 const Container = styled.div`
   padding: 20px 20px;
-`;
-
-const Goal = styled.div`
-  border: 1px solid black;
-  margin: 15px 0;
-  padding: 10px;
-  max-width: 200px;
 `;
 
 const Home = () => {
@@ -70,30 +62,29 @@ const Home = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <Container>
-        <Text>Goals</Text>
-        <GoalList goals={goals} removeGoal={removeGoal} />
-        <Form>
-          <FormField>
-            <FormFieldLabel name="password">Email</FormFieldLabel>
-            <Input
-              name="Add Goal"
-              placeholder="One big thing"
-              type="text"
-              onChange={(e) => setGoal(e.target.value)}
-              value={goal.content}
-            />
-          </FormField>
-          <FormField row scale="lg">
-            <Button onClick={(e) => addGoal(e)} type="submit">
-              Submit
-            </Button>
-          </FormField>
-        </Form>
-      </Container>
-    </>
+    <Container>
+      <p>Goals</p>
+      <GoalList goals={goals} removeGoal={removeGoal} />
+      <form>
+        <TextField
+          label="Add New Goal"
+          variant="outlined"
+          onChange={(e) => setGoal(e.target.value)}
+          value={goal.content}
+        />
+
+        <FormControl row scale="lg">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={(e) => addGoal(e)}
+            type="submit"
+          >
+            Submit
+          </Button>
+        </FormControl>
+      </form>
+    </Container>
   );
 };
 

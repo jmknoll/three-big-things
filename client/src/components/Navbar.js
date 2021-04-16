@@ -1,28 +1,37 @@
 import React from "react";
 import styled from "styled-components";
 import { useAuth } from "../providers/AuthProvider";
-import { Button } from "@smooth-ui/core-sc";
+import { Button } from "@material-ui/core";
 
 const Wrapper = styled.div`
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  background-color: white;
+  position: fixed;
+  width: 100%;
 `;
 
 const Logo = styled.div`
+  font-size: 18px;
+  color: black;
   font-weight: 700;
+  cursor: pointer;
 `;
 
 const Navbar = () => {
   const { dispatch } = useAuth();
 
   return (
-    <Wrapper>
+    <Wrapper position="fixed">
       <Logo>TBT</Logo>
       <Button
+        variant="contained"
+        color="primary"
         onClick={() => {
           dispatch({ type: "LOGOUT" });
         }}
