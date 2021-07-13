@@ -6,14 +6,6 @@ import Navbar from "../components/Navbar";
 
 import styled from "styled-components";
 
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  TextField,
-  Button,
-} from "@material-ui/core";
-
 const dataService = new DataService();
 
 const Container = styled.div`
@@ -66,23 +58,22 @@ const Home = () => {
       <p>Goals</p>
       <GoalList goals={goals} removeGoal={removeGoal} />
       <form>
-        <TextField
+        <input
+          type="text"
           label="Add New Goal"
           variant="outlined"
           onChange={(e) => setGoal(e.target.value)}
           value={goal.content}
         />
 
-        <FormControl row scale="lg">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={(e) => addGoal(e)}
-            type="submit"
-          >
-            Submit
-          </Button>
-        </FormControl>
+        <button
+          variant="contained"
+          color="primary"
+          onClick={(e) => addGoal(e)}
+          type="submit"
+        >
+          Submit
+        </button>
       </form>
     </Container>
   );

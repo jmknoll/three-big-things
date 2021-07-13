@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { useAuth } from "../providers/AuthProvider";
-import { Button } from "@material-ui/core";
 
 const Wrapper = styled.div`
   display: flex;
@@ -29,15 +28,13 @@ const Navbar = () => {
   return (
     <Wrapper position="fixed">
       <Logo>TBT</Logo>
-      <Button
-        variant="contained"
-        color="primary"
+      <button
         onClick={() => {
           dispatch({ type: "LOGOUT" });
         }}
       >
         Logout
-      </Button>
+      </button>
     </Wrapper>
   );
 };
