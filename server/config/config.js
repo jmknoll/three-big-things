@@ -14,7 +14,6 @@ const dbConfig = {
   dialect: "postgres",
 };
 
-
 module.exports = {
   dbConfig,
   // Keys map to process.env.NODE_ENV
@@ -25,11 +24,13 @@ module.exports = {
     ...dbConfig,
     ssl: {
       rejectUnauthorized: false,
+    },
   },
   production: {
     use_env_variable: "DATABASE_URL",
-    ...dbConfig,  
+    ...dbConfig,
     ssl: {
       rejectUnauthorized: false,
+    },
   },
 };
