@@ -24,6 +24,7 @@ import {
 } from "@heroicons/react/solid";
 import { AuthProvider, useAuth } from "../providers/AuthProvider";
 import dataService from "../services/DataService";
+import { Avatar, Placeholder } from "../components/Avatar";
 
 const navigation = [
   { name: "Home", href: "#", icon: HomeIcon, current: true },
@@ -71,6 +72,8 @@ const Dashboard = () => {
   let [goals, setGoals] = useState([]);
   const [goal, setGoal] = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  console.log(user);
 
   const handleLogout = () => {
     dispatch({
@@ -307,7 +310,7 @@ const Dashboard = () => {
                     id="search-field"
                     name="search-field"
                     className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
-                    placeholder="Search transactions"
+                    placeholder="Search goals..."
                     type="search"
                   />
                 </div>
@@ -326,14 +329,9 @@ const Dashboard = () => {
               <Menu as="div" className="ml-3 relative">
                 <div>
                   <Menu.Button className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
-                    <img
-                      className="h-8 w-8 rounded-full"
-                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
-                    />
                     <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-                      <span className="sr-only">Open user menu for </span>Emilia
-                      Birch
+                      <span className="sr-only">Open user menu for </span>
+                      <Avatar name={user.name} />
                     </span>
                     <ChevronDownIcon
                       className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"
@@ -407,40 +405,14 @@ const Dashboard = () => {
                 <div className="flex-1 min-w-0">
                   {/* Profile */}
                   <div className="flex items-center">
-                    <img
-                      className="hidden h-16 w-16 rounded-full sm:block"
-                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.6&w=256&h=256&q=80"
-                      alt=""
-                    />
+                    <Placeholder size="16" />
+
                     <div>
                       <div className="flex items-center">
-                        <img
-                          className="h-16 w-16 rounded-full sm:hidden"
-                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.6&w=256&h=256&q=80"
-                          alt=""
-                        />
                         <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                          Good morning, Emilia Birch
+                          What are you working on, {user.name.split(" ")[0]}?
                         </h1>
                       </div>
-                      <dl className="mt-6 flex flex-col sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
-                        <dt className="sr-only">Company</dt>
-                        <dd className="flex items-center text-sm text-gray-500 font-medium capitalize sm:mr-6">
-                          <OfficeBuildingIcon
-                            className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                            aria-hidden="true"
-                          />
-                          Duke street studio
-                        </dd>
-                        <dt className="sr-only">Account status</dt>
-                        <dd className="mt-3 flex items-center text-sm text-gray-500 font-medium sm:mr-6 sm:mt-0 capitalize">
-                          <CheckCircleIcon
-                            className="flex-shrink-0 mr-1.5 h-5 w-5 text-green-400"
-                            aria-hidden="true"
-                          />
-                          Verified account
-                        </dd>
-                      </dl>
                     </div>
                   </div>
                 </div>
@@ -465,7 +437,7 @@ const Dashboard = () => {
           <div className="mt-8">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <h2 className="text-lg leading-6 font-medium text-gray-900">
-                Overview
+                Weekly Goals
               </h2>
               <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {/* Card */}

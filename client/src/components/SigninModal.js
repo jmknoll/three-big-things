@@ -175,7 +175,7 @@ const SigninModal = (props) => {
                               <button
                                 onClick={renderProps.onClick}
                                 disabled={renderProps.disabled}
-                                className="flex w-full place-content-center align-items-center"
+                                className="flex w-full place-content-center items-center"
                               >
                                 <GoogleLogo />
                                 <span className="ml-4">Google</span>
