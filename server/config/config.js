@@ -29,6 +29,7 @@ module.exports = {
   production: {
     use_env_variable: "DATABASE_URL",
     ...dbConfig,
+    sslmode: "require",
     ssl: {
       rejectUnauthorized: false,
     },
