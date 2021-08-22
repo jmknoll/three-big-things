@@ -14,11 +14,6 @@ const dbConfig = {
   dialect: "postgres",
 };
 
-const sslOptions = {
-  dialectOptions: {
-    ssl: true,
-  },
-};
 
 module.exports = {
   dbConfig,
@@ -28,11 +23,13 @@ module.exports = {
   },
   staging: {
     ...dbConfig,
-    ...sslOptions,
+    ssl: {
+      rejectUnauthorized: false,
   },
   production: {
     use_env_variable: "DATABASE_URL",
-    ...dbConfig,
-    ...sslOptions,
+    ...dbConfig,  
+    ssl: {
+      rejectUnauthorized: false,
   },
 };
