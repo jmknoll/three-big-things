@@ -19,19 +19,25 @@ module.exports = {
   // Keys map to process.env.NODE_ENV
   development: {
     ...dbConfig,
+    dialect: "postgresql",
   },
   staging: {
     ...dbConfig,
-    ssl: {
-      rejectUnauthorized: false,
+    dialect: "postgresql",
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
     },
   },
   production: {
     use_env_variable: "DATABASE_URL",
     ...dbConfig,
-    sslmode: "require",
-    ssl: {
-      rejectUnauthorized: false,
+    dialect: "postgresql",
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
     },
   },
 };
