@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useAuth } from "../providers/AuthProvider";
 
 const Wrapper = styled.div`
+  position: absolute;
+  z-index: 2;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -27,7 +29,6 @@ const Navbar = () => {
 
   return (
     <Wrapper position="fixed">
-      <Logo>TBT</Logo>
       <button
         onClick={() => {
           dispatch({ type: "LOGOUT" });

@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 import Layout from "./pages/Layout";
-import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import NoMatch from "./pages/404";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -21,14 +21,14 @@ function App() {
         <Layout>
           <Switch>
             <Route path="/" exact>
-              <Redirect to="/home" />
+              <Redirect to="/dashboard" />
             </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
-            <ProtectedRoute path="/home">
-              <Home />
+            <ProtectedRoute path="/dashboard">
+              <Dashboard />
             </ProtectedRoute>
+            <Route path="/">
+              <Home />
+            </Route>
             <Route path="*">
               <NoMatch />
             </Route>

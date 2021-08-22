@@ -1,5 +1,4 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 import styled from "styled-components";
 
 const StyledLayout = styled.div`
@@ -7,12 +6,7 @@ const StyledLayout = styled.div`
 `;
 
 const Layout = (props) => {
-  return (
-    <StyledLayout>
-      <Navbar></Navbar>
-      {props.children}
-    </StyledLayout>
-  );
+  return <StyledLayout>{props.children}</StyledLayout>;
 };
 
 export default Layout;

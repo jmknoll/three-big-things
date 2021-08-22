@@ -5,6 +5,7 @@ const db = require("../models");
 const User = db.User;
 
 async function oauth(req, res, next) {
+  console.log("authing");
   try {
     const client = new OAuth2Client(process.env.GAPI_CLIENT_ID);
     const { token } = req.body;

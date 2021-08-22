@@ -1,7 +1,6 @@
 import React, { useEffect, useReducer } from "react";
 import ProtectedRoute from "../components/ProtectedRoute";
-import DataService from "../services/DataService";
-const dataService = new DataService();
+import dataService from "../services/DataService";
 
 const AuthContext = React.createContext();
 
@@ -22,6 +21,7 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
+      console.log("logging in", action.payload);
       localStorage.setItem("user", JSON.stringify(action.payload.user));
       localStorage.setItem("token", JSON.stringify(action.payload.token));
       return {
@@ -53,11 +53,11 @@ function AuthProvider(props) {
   const fetchUser = async () => {
     try {
       const token = JSON.parse(localStorage.getItem("token"));
-      const [result, error] = await dataService.fetchUser({ token });
-      if (result) {
+      const { data, error } = await dataService.fetchUser({ token });
+      if (data) {
         dispatch({
           type: "LOGIN",
-          payload: { user: result.user, token: result.token },
+          payload: { user: data.user, token: data.token },
         });
       }
     } catch (e) {
