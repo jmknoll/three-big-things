@@ -25,6 +25,8 @@ import {
 import { AuthProvider, useAuth } from "../providers/AuthProvider";
 import dataService from "../services/DataService";
 import { Avatar, Placeholder } from "../components/Avatar";
+import { NewGoalButton } from "../components/NewGoalButton";
+import { NewGoalModal } from "../components/NewGoalModal";
 
 const navigation = [
   { name: "Home", href: "#", icon: HomeIcon, current: true },
@@ -72,8 +74,7 @@ const Dashboard = () => {
   let [goals, setGoals] = useState([]);
   const [goal, setGoal] = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  console.log(user);
+  const [showGoalModal, setShowGoalModal] = useState(false);
 
   const handleLogout = () => {
     dispatch({
@@ -416,7 +417,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </div>
-                <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
+                {/* <div className="mt-6 flex space-x-3 md:mt-0 md:ml-4">
                   <button
                     type="button"
                     className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -429,7 +430,7 @@ const Dashboard = () => {
                   >
                     Send money
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -480,6 +481,11 @@ const Dashboard = () => {
                     </div>
                   </div>
                 ))}
+                <NewGoalButton
+                  type="weekly"
+                  showGoalModal={showGoalModal}
+                  setShowGoalModal={setShowGoalModal}
+                />
               </div>
             </div>
 
@@ -649,6 +655,10 @@ const Dashboard = () => {
           </div>
         </main>
       </div>
+      <NewGoalModal
+        showGoalModal={showGoalModal}
+        setShowGoalModal={setShowGoalModal}
+      />
     </div>
   );
 };
