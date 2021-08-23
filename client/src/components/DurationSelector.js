@@ -14,7 +14,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function DurationSelector(props) {
+export const DurationSelector = (props) => {
   const [selected, setSelected] = useState(plans[0]);
 
   return (
@@ -41,19 +41,6 @@ export default function DurationSelector(props) {
                     </RadioGroup.Label>
                   </div>
                 </div>
-                <RadioGroup.Description
-                  as="div"
-                  className="mt-2 flex text-sm sm:mt-0 sm:block sm:ml-4 sm:text-right"
-                >
-                  <div className="font-medium text-gray-900">{plan.price}</div>
-                </RadioGroup.Description>
-                <div
-                  className={classNames(
-                    checked ? "border-indigo-500" : "border-transparent",
-                    "absolute -inset-px rounded-lg border-2 pointer-events-none"
-                  )}
-                  aria-hidden="true"
-                />
               </>
             )}
           </RadioGroup.Option>
@@ -61,4 +48,4 @@ export default function DurationSelector(props) {
       </div>
     </RadioGroup>
   );
-}
+};

@@ -1,7 +1,7 @@
 import React, { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { CheckIcon } from "@heroicons/react/outline";
-import DurationSelector from "./DurationSelector";
+import { DurationSelector } from "./DurationSelector";
+import { GoalStatusSelector } from "./GoalStatusSelector";
 
 export const NewGoalModal = (props) => {
   const { showGoalModal, setShowGoalModal, type } = props;
@@ -45,7 +45,7 @@ export const NewGoalModal = (props) => {
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-7 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
               <h3 className="text-lg mb-4 font-medium text-gray-900">
                 Add a New Goal
               </h3>
@@ -84,7 +84,18 @@ export const NewGoalModal = (props) => {
                 </div>
                 <div className="mt-4">
                   <label
-                    htmlFor="description"
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Status
+                  </label>
+                  <div className="mt-1">
+                    <GoalStatusSelector />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label
+                    htmlFor="duration"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Duration
