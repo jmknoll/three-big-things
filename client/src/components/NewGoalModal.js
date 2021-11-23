@@ -125,7 +125,10 @@ export const NewGoalModal = (props) => {
                     Duration
                   </label>
                   <div className="mt-1">
-                    <DurationSelector updateGoal={updateGoal} type={type} />
+                    <DurationSelector
+                      updateGoal={updateGoal}
+                      type={props.type}
+                    />
                   </div>
                 </div>
               </div>

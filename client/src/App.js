@@ -13,28 +13,31 @@ import NoMatch from "./pages/404";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import { AuthProvider } from "./providers/AuthProvider";
+import { DataProvider } from "./providers/DataProvider";
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Layout>
-          <Switch>
-            <Route path="/" exact>
-              <Redirect to="/dashboard" />
-            </Route>
-            <ProtectedRoute path="/dashboard">
-              <Dashboard />
-            </ProtectedRoute>
-            <Route path="/">
-              <Home />
-            </Route>
-            <Route path="*">
-              <NoMatch />
-            </Route>
-          </Switch>
-        </Layout>
-      </Router>
+      <DataProvider>
+        <Router>
+          <Layout>
+            <Switch>
+              <Route path="/" exact>
+                <Redirect to="/dashboard" />
+              </Route>
+              <ProtectedRoute path="/dashboard">
+                <Dashboard />
+              </ProtectedRoute>
+              <Route path="/">
+                <Home />
+              </Route>
+              <Route path="*">
+                <NoMatch />
+              </Route>
+            </Switch>
+          </Layout>
+        </Router>
+      </DataProvider>
     </AuthProvider>
   );
 }

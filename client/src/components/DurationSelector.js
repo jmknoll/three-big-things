@@ -20,13 +20,17 @@ export const DurationSelector = (props) => {
   const [selected, setSelected] = useState(options[0]);
 
   useEffect(() => {
-    props.updateGoal({ period: options.find((el) => el.value === props.type) });
+    const option = options.find((el) => el.value === props.type);
+    props.updateGoal({ period: option.value });
+    setSelected(option);
   }, [false]);
 
-  const handleChange = (e) => {
-    setSelected(e);
-    props.updateGoal("period", e.value);
+  const handleChange = (option) => {
+    setSelected(option);
+    props.updateGoal("period", option.value);
   };
+
+  console.log("props type", props.type);
 
   return (
     <RadioGroup value={selected} onChange={handleChange}>

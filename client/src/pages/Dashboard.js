@@ -14,9 +14,9 @@ import {
   UserGroupIcon,
   XIcon,
 } from "@heroicons/react/outline";
-import { CashIcon, ChevronDownIcon, SearchIcon } from "@heroicons/react/solid";
+import { ChevronDownIcon, SearchIcon } from "@heroicons/react/solid";
 import { useAuth } from "../providers/AuthProvider";
-import dataService from "../services/DataService";
+import { useData } from "../providers/DataProvider";
 import { Avatar, Placeholder } from "../components/Avatar";
 import { NewGoalButton } from "../components/NewGoalButton";
 import { NewGoalModal } from "../components/NewGoalModal";
@@ -35,21 +35,16 @@ const secondaryNavigation = [
   { name: "Privacy", href: "#", icon: ShieldCheckIcon },
 ];
 
-const statusStyles = {
-  success: "bg-green-100 text-green-800",
-  processing: "bg-yellow-100 text-yellow-800",
-  failed: "bg-gray-100 text-gray-800",
-};
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const Dashboard = () => {
   const { state, dispatch } = useAuth();
+  const {
+    state: { goals },
+  } = useData();
   const { user, token } = state;
-  let [goals, setGoals] = useState([]);
-  const [goal, setGoal] = useState({});
   const [type, setType] = useState("WEEKLY");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
@@ -58,42 +53,6 @@ const Dashboard = () => {
     dispatch({
       type: "LOGOUT",
     });
-  };
-
-  useEffect(() => {
-    dataService
-      .fetchGoals({ token: token })
-      .then((res) => {
-        console.log("goals", res.data);
-        setGoals(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [false]);
-
-  const addGoal = (e) => {
-    e.preventDefault();
-    dataService
-      .createGoal({ token, goal })
-      .then((res) => {
-        setGoals([...goals, res.data]);
-        setGoal({ content: "" });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const removeGoal = (goal) => {
-    dataService
-      .removeGoal({ token: user.token, goal: goal })
-      .then((res) => {
-        setGoals(goals.filter((goal) => goal.id !== parseInt(res.data.id)));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   };
 
   return (
@@ -432,36 +391,54 @@ const Dashboard = () => {
                     </div>
                   ))}
                 <NewGoalButton
-                  type="weekly"
+                  setType={setType}
+                  type="WEEKLY"
                   showGoalModal={showGoalModal}
                   setShowGoalModal={setShowGoalModal}
                 />
               </div>
             </div>
 
-            <h2 className="max-w-6xl mx-auto mt-8 px-4 text-lg leading-6 font-medium text-gray-900 sm:px-6 lg:px-8">
-              Daily Goals
-            </h2>
-
-            <nav
-              className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200"
-              aria-label="Pagination"
-            >
-              <div className="flex-1 flex justify-between">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:text-gray-500"
-                >
-                  Previous
-                </a>
-                <a
-                  href="#"
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:text-gray-500"
-                >
-                  Next
-                </a>
+            <div className="mt-8">
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 className="text-lg leading-6 font-medium text-gray-900">
+                  Daily Goals
+                </h2>
+                <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {goals &&
+                    goals.map((goal) => (
+                      <div
+                        key={goal.name}
+                        className="bg-white overflow-hidden shadow rounded-lg"
+                      >
+                        <div className="p-5">
+                          <div className="flex items-center">
+                            <div className="ml-5 w-0 flex-1">
+                              <dl>
+                                <dt className="text-sm font-medium text-gray-500 truncate">
+                                  {goal.name}
+                                </dt>
+                                <dd>
+                                  <div className="text-lg font-medium text-gray-900">
+                                    {goal.content}
+                                  </div>
+                                </dd>
+                              </dl>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-gray-50 px-5 py-3"></div>
+                      </div>
+                    ))}
+                  <NewGoalButton
+                    setType={setType}
+                    type="DAILY"
+                    showGoalModal={showGoalModal}
+                    setShowGoalModal={setShowGoalModal}
+                  />
+                </div>
               </div>
-            </nav>
+            </div>
           </div>
         </main>
       </div>
