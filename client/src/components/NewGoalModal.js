@@ -2,10 +2,28 @@ import React, { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { DurationSelector } from "./DurationSelector";
 import { GoalStatusSelector } from "./GoalStatusSelector";
+import dataService from "../services/DataService";
+import { useAuth } from "../providers/AuthProvider";
 
 export const NewGoalModal = (props) => {
+  const {
+    state: { token },
+  } = useAuth();
+  const [goal, setGoal] = useState({});
   const { showGoalModal, setShowGoalModal, type } = props;
   const cancelButtonRef = useRef(null);
+
+  const updateGoal = (key, value) => {
+    setGoal({
+      ...goal,
+      [key]: value,
+    });
+  };
+
+  const createGoal = () => {
+    dataService.createGoal({ goal, token });
+    setShowGoalModal(false);
+  };
 
   return (
     <Transition.Root show={showGoalModal} as={Fragment}>
@@ -62,7 +80,10 @@ export const NewGoalModal = (props) => {
                     name="project-name"
                     id="project-name"
                     className="block w-full shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm border-gray-300 rounded-md"
-                    defaultValue=""
+                    defaultValue={goal.name}
+                    onChange={(e) => {
+                      updateGoal("name", e.target.value);
+                    }}
                   />
                 </div>
                 <div className="mt-4">
@@ -78,7 +99,10 @@ export const NewGoalModal = (props) => {
                       name="description"
                       rows={3}
                       className="block w-full shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm border border-gray-300 rounded-md"
-                      defaultValue={""}
+                      defaultValue={goal.description}
+                      onChange={(e) => {
+                        updateGoal("content", e.target.value);
+                      }}
                     />
                   </div>
                 </div>
@@ -90,7 +114,7 @@ export const NewGoalModal = (props) => {
                     Status
                   </label>
                   <div className="mt-1">
-                    <GoalStatusSelector />
+                    <GoalStatusSelector updateGoal={updateGoal} />
                   </div>
                 </div>
                 <div className="mt-4">
@@ -101,7 +125,7 @@ export const NewGoalModal = (props) => {
                     Duration
                   </label>
                   <div className="mt-1">
-                    <DurationSelector />
+                    <DurationSelector updateGoal={updateGoal} type={type} />
                   </div>
                 </div>
               </div>
@@ -109,7 +133,7 @@ export const NewGoalModal = (props) => {
                 <button
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
-                  onClick={() => setShowGoalModal(false)}
+                  onClick={() => createGoal()}
                 >
                   Save
                 </button>

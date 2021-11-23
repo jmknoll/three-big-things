@@ -7,6 +7,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const port = process.env.PORT || 8080;
 const passport = require("passport");
+const morgan = require("morgan");
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
 app.use(cors());
@@ -18,9 +21,14 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to three big things." });
-});
+app.use(morgan("dev"));
+
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  { flags: "a" }
+);
+
+app.use(morgan("common", { stream: accessLogStream }));
 
 require("./routes")(app);
 

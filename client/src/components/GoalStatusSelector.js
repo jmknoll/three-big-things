@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import React, { Fragment, useState } from "react";
+import React, { useEffect, Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 
@@ -22,8 +22,13 @@ function classNames(...classes) {
 export const GoalStatusSelector = (props) => {
   const [selected, setSelected] = useState(statuses[0]);
 
+  useEffect(() => {
+    props.updateGoal(statuses[0]);
+  }, [false]);
+
   const _handleChange = (status) => {
     setSelected(statuses.find((el) => el.value === status));
+    props.updateGoal("status", status);
   };
 
   return (

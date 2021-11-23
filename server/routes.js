@@ -24,6 +24,10 @@ module.exports = (app) => {
     });
   }
 
+  router.get("/", (req, res) => {
+    res.json({ message: "Welcome to three big things." });
+  });
+
   router.get(
     "/me",
     verifyToken,

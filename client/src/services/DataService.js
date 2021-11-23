@@ -39,7 +39,6 @@ const oauth = (params) => {
       return { result: res.data, error: null };
     })
     .catch((err) => {
-      console.log("catch", err);
       return { result: null, error: err };
     });
 };
@@ -67,9 +66,10 @@ const fetchGoals = (params) => {
 };
 
 const createGoal = (params) => {
+  const { goal } = params;
   return axios.post(
     `${process.env.REACT_APP_BASE_URL}/goals`,
-    { period: "daily", content: params.goal },
+    { ...goal },
     {
       headers: {
         "Content-type": "application/json",
