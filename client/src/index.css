@@ -5,3 +5,7 @@
 #logo {
   filter: invert(1);
 }
+
+.alert a {
+  text-decoration: underline;
+}

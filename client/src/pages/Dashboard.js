@@ -1,20 +1,21 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 import {
-  BellIcon,
   ClockIcon,
   CogIcon,
   HomeIcon,
   MenuAlt1Icon,
   XIcon,
 } from "@heroicons/react/outline";
-import { ChevronDownIcon, SearchIcon } from "@heroicons/react/solid";
+
 import { useAuth } from "../providers/AuthProvider";
 import { useData } from "../providers/DataProvider";
-import { Avatar, Placeholder } from "../components/Avatar";
+import { Placeholder } from "../components/Avatar";
 import { NewGoalButton } from "../components/NewGoalButton";
 import { NewGoalModal } from "../components/NewGoalModal";
+import Alert from "../components/Alert";
 import Card from "../components/Card";
+import Search from "../components/Search";
 import logo from "../assets/logo_transparent.png";
 
 const navigation = [
@@ -28,25 +29,32 @@ function classNames(...classes) {
 }
 
 const Dashboard = () => {
-  const { state, dispatch } = useAuth();
+  const {
+    state: { user, token },
+  } = useAuth();
   const {
     state: { goals },
     dispatch: { fetchGoals },
   } = useData();
-  const { user, token } = state;
+
   const [type, setType] = useState("WEEKLY");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
 
-  const handleLogout = () => {
-    dispatch({
-      type: "LOGOUT",
-    });
-  };
-
   useEffect(() => {
     fetchGoals({ token });
   }, [token]);
+
+  const [weeklyGoals, dailyGoals] =
+    goals &&
+    goals.reduce(
+      (acc, curr) => {
+        const i = curr.period === "WEEKLY" ? 0 : 1;
+        acc[i] = [...acc[i], curr];
+        return acc;
+      },
+      [[], []]
+    );
 
   return (
     <div className="relative h-screen flex overflow-hidden bg-gray-100">
@@ -98,7 +106,7 @@ const Dashboard = () => {
                 </div>
               </Transition.Child>
               <div className="flex-shrink-0 flex items-center px-4">
-                <img className="h-8 w-auto" src={logo} alt="goalbook logo" />
+                <img className="w-2/3 m-auto" src={logo} alt="goalbook logo" />
               </div>
               <nav
                 className="mt-5 flex-shrink-0 h-full divide-y divide-cyan-800 overflow-y-auto"
@@ -221,111 +229,9 @@ const Dashboard = () => {
             <span className="sr-only">Open sidebar</span>
             <MenuAlt1Icon className="h-6 w-6" aria-hidden="true" />
           </button>
-          {/* Search bar */}
-          <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
-            <div className="flex-1 flex">
-              <form className="w-full flex md:ml-0" action="#" method="GET">
-                <label htmlFor="search-field" className="sr-only">
-                  Search
-                </label>
-                <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-                  <div
-                    className="absolute inset-y-0 left-0 flex items-center pointer-events-none"
-                    aria-hidden="true"
-                  >
-                    <SearchIcon className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <input
-                    id="search-field"
-                    name="search-field"
-                    className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
-                    placeholder="Search goals..."
-                    type="search"
-                  />
-                </div>
-              </form>
-            </div>
-            <div className="ml-4 flex items-center md:ml-6">
-              <button
-                type="button"
-                className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
-              >
-                <span className="sr-only">View notifications</span>
-                <BellIcon className="h-6 w-6" aria-hidden="true" />
-              </button>
-
-              {/* Profile dropdown */}
-              <Menu as="div" className="ml-3 relative">
-                <div>
-                  <Menu.Button className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
-                    <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
-                      <span className="sr-only">Open user menu for </span>
-                      <Avatar name={user.name} />
-                    </span>
-                    <ChevronDownIcon
-                      className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"
-                      aria-hidden="true"
-                    />
-                  </Menu.Button>
-                </div>
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a
-                          href="#"
-                          className={classNames(
-                            active ? "bg-gray-100" : "",
-                            "block px-4 py-2 text-sm text-gray-700"
-                          )}
-                        >
-                          Your Profile
-                        </a>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a
-                          href="#"
-                          className={classNames(
-                            active ? "bg-gray-100" : "",
-                            "block px-4 py-2 text-sm text-gray-700"
-                          )}
-                        >
-                          Settings
-                        </a>
-                      )}
-                    </Menu.Item>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a
-                          href="#"
-                          className={classNames(
-                            active ? "bg-gray-100" : "",
-                            "block px-4 py-2 text-sm text-gray-700"
-                          )}
-                          onClick={() => {
-                            handleLogout();
-                          }}
-                        >
-                          Logout
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
-            </div>
-          </div>
+          <Search />
         </div>
+
         <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
           {/* Page header */}
           <div className="bg-white shadow">
@@ -354,11 +260,11 @@ const Dashboard = () => {
               <h2 className="text-lg leading-6 font-medium text-gray-900">
                 Weekly Goals
               </h2>
+              {weeklyGoals.length > 3 && <Alert content={alertContent} />}
               <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {goals &&
-                  goals
-                    .filter((goals) => goals.period === "WEEKLY")
-                    .map((goal, i) => <Card key={i} goal={goal} />)}
+                {weeklyGoals.map((goal, i) => (
+                  <Card key={i} goal={goal} />
+                ))}
                 <NewGoalButton
                   setType={setType}
                   type="WEEKLY"
@@ -373,11 +279,11 @@ const Dashboard = () => {
                 <h2 className="text-lg leading-6 font-medium text-gray-900">
                   Daily Goals
                 </h2>
+                {dailyGoals.length > 3 && <Alert content={alertContent} />}
                 <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  {goals &&
-                    goals
-                      .filter((goals) => goals.period === "DAILY")
-                      .map((goal, i) => <Card key={i} goal={goal} />)}
+                  {dailyGoals.map((goal, i) => (
+                    <Card key={i} goal={goal} />
+                  ))}
                   <NewGoalButton
                     setType={setType}
                     type="DAILY"
@@ -399,5 +305,20 @@ const Dashboard = () => {
     </div>
   );
 };
+
+const alertContent = () => (
+  <p>
+    In order to stay focused on what matters, try to limit yourself to three
+    goals at any one time. See{" "}
+    <a
+      href="https://alifeofproductivity.com/rule-of-three/"
+      target="_blank"
+      rel="noreferrer"
+    >
+      The Rule of Three
+    </a>{" "}
+    for more info.
+  </p>
+);
 
 export default Dashboard;

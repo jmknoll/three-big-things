@@ -46,8 +46,6 @@ export const NewGoalModal = (props) => {
     setGoal(defaultGoal);
   };
 
-  console.log("type", props.type, durationSelectorOptions, goal);
-
   return (
     <Transition.Root show={showGoalModal} as={Fragment}>
       <Dialog
