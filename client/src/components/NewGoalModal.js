@@ -1,17 +1,37 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { DurationSelector } from "./DurationSelector";
 import { GoalStatusSelector } from "./GoalStatusSelector";
-import dataService from "../services/DataService";
 import { useAuth } from "../providers/AuthProvider";
+import { useData } from "../providers/DataProvider";
+import { durationSelectorOptions, statuses } from "../constants";
 
 export const NewGoalModal = (props) => {
   const {
     state: { token },
   } = useAuth();
-  const [goal, setGoal] = useState({});
-  const { showGoalModal, setShowGoalModal, type } = props;
+
+  const {
+    dispatch: { createGoal },
+  } = useData();
+
+  const defaultGoal = {
+    period: durationSelectorOptions.find((el) => el.value === props.type)
+      ?.value,
+    status: statuses[0].value,
+  };
+
+  const [goal, setGoal] = useState(props.goal || defaultGoal);
+
+  const { showGoalModal, setShowGoalModal } = props;
   const cancelButtonRef = useRef(null);
+
+  useEffect(() => {
+    updateGoal(
+      "period",
+      durationSelectorOptions.find((el) => el.value === props.type)?.value
+    );
+  }, [props.type]);
 
   const updateGoal = (key, value) => {
     setGoal({
@@ -20,10 +40,13 @@ export const NewGoalModal = (props) => {
     });
   };
 
-  const createGoal = () => {
-    dataService.createGoal({ goal, token });
+  const _createGoal = () => {
+    createGoal({ token, goal });
     setShowGoalModal(false);
+    setGoal(defaultGoal);
   };
+
+  console.log("type", props.type, durationSelectorOptions, goal);
 
   return (
     <Transition.Root show={showGoalModal} as={Fragment}>
@@ -80,7 +103,7 @@ export const NewGoalModal = (props) => {
                     name="project-name"
                     id="project-name"
                     className="block w-full shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm border-gray-300 rounded-md"
-                    defaultValue={goal.name}
+                    value={goal.name}
                     onChange={(e) => {
                       updateGoal("name", e.target.value);
                     }}
@@ -99,7 +122,7 @@ export const NewGoalModal = (props) => {
                       name="description"
                       rows={3}
                       className="block w-full shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm border border-gray-300 rounded-md"
-                      defaultValue={goal.description}
+                      value={goal.content}
                       onChange={(e) => {
                         updateGoal("content", e.target.value);
                       }}
@@ -127,7 +150,7 @@ export const NewGoalModal = (props) => {
                   <div className="mt-1">
                     <DurationSelector
                       updateGoal={updateGoal}
-                      type={props.type}
+                      value={goal.period}
                     />
                   </div>
                 </div>
@@ -136,7 +159,7 @@ export const NewGoalModal = (props) => {
                 <button
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
-                  onClick={() => createGoal()}
+                  onClick={() => _createGoal()}
                 >
                   Save
                 </button>

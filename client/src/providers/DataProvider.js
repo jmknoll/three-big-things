@@ -11,9 +11,11 @@ const useData = () => {
   return context;
 };
 
+const initialGoal = {};
+
 const initialState = {
   goals: [],
-  goal: {},
+  goal: initialGoal,
 };
 
 const DataProvider = (props) => {
@@ -37,11 +39,17 @@ const DataProvider = (props) => {
       });
   };
 
-  const addGoal = ({ goal, token }) => {
+  const createGoal = ({ goal, token }) => {
     dataService
       .createGoal({ token, goal })
       .then((res) => {
-        const goals = [...state.goals, res.data];
+        const index = state.goals.findIndex((goal) => goal.id === res.data.id);
+        // this handles the response from upsert to determine if it is a create or update
+        const goals =
+          index > -1
+            ? Object.assign([], state.goals, { [index]: res.data })
+            : [...state.goals, res.data];
+        console.log(goals);
         updateState("goals", goals);
         updateState("goal", {});
       })
@@ -64,13 +72,13 @@ const DataProvider = (props) => {
       });
   };
 
-  const actions = {
+  const dispatch = {
     fetchGoals,
-    addGoal,
+    createGoal,
     removeGoal,
   };
 
-  return <DataContext.Provider value={{ actions, state }} {...props} />;
+  return <DataContext.Provider value={{ dispatch, state }} {...props} />;
 };
 
 export { DataProvider, useData };

@@ -2,22 +2,8 @@
 import React, { useEffect, Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
-
-const statuses = [
-  { id: 1, label: "In progress", value: "IN_PROGRESS" },
-  { id: 2, label: "Complete", value: "COMPLETE" },
-  { id: 3, label: "Not Completed", value: "NOT_COMPLETED" },
-];
-
-const statusColorMap = {
-  IN_PROGRESS: "yellow",
-  COMPLETE: "green",
-  NOT_COMPLETED: "red",
-};
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
+import { statuses, statusColorMap } from "../constants";
+import { classNames } from "../utils";
 
 export const GoalStatusSelector = (props) => {
   const [selected, setSelected] = useState(statuses[0]);

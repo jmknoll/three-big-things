@@ -1,36 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { RadioGroup } from "@headlessui/react";
-
-const options = [
-  {
-    label: "Weekly",
-    value: "WEEKLY",
-  },
-  {
-    label: "Daily",
-    value: "DAILY",
-  },
-];
+import { durationSelectorOptions as options } from "../constants";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export const DurationSelector = (props) => {
-  const [selected, setSelected] = useState(options[0]);
-
-  useEffect(() => {
-    const option = options.find((el) => el.value === props.type);
-    props.updateGoal({ period: option.value });
-    setSelected(option);
-  }, [false]);
+  const [selected, setSelected] = useState(
+    options.find((el) => el.value === props.value)
+  );
 
   const handleChange = (option) => {
     setSelected(option);
     props.updateGoal("period", option.value);
   };
-
-  console.log("props type", props.type);
 
   return (
     <RadioGroup value={selected} onChange={handleChange}>

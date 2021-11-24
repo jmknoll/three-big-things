@@ -4,14 +4,8 @@ import {
   BellIcon,
   ClockIcon,
   CogIcon,
-  CreditCardIcon,
-  DocumentReportIcon,
   HomeIcon,
   MenuAlt1Icon,
-  QuestionMarkCircleIcon,
-  ScaleIcon,
-  ShieldCheckIcon,
-  UserGroupIcon,
   XIcon,
 } from "@heroicons/react/outline";
 import { ChevronDownIcon, SearchIcon } from "@heroicons/react/solid";
@@ -20,20 +14,14 @@ import { useData } from "../providers/DataProvider";
 import { Avatar, Placeholder } from "../components/Avatar";
 import { NewGoalButton } from "../components/NewGoalButton";
 import { NewGoalModal } from "../components/NewGoalModal";
+import Card from "../components/Card";
+import logo from "../assets/logo_transparent.png";
 
 const navigation = [
   { name: "Home", href: "#", icon: HomeIcon, current: true },
   { name: "History", href: "#", icon: ClockIcon, current: false },
-  { name: "Balances", href: "#", icon: ScaleIcon, current: false },
-  { name: "Cards", href: "#", icon: CreditCardIcon, current: false },
-  { name: "Recipients", href: "#", icon: UserGroupIcon, current: false },
-  { name: "Reports", href: "#", icon: DocumentReportIcon, current: false },
 ];
-const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
-  { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
-  { name: "Privacy", href: "#", icon: ShieldCheckIcon },
-];
+const secondaryNavigation = [{ name: "Settings", href: "#", icon: CogIcon }];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -43,6 +31,7 @@ const Dashboard = () => {
   const { state, dispatch } = useAuth();
   const {
     state: { goals },
+    dispatch: { fetchGoals },
   } = useData();
   const { user, token } = state;
   const [type, setType] = useState("WEEKLY");
@@ -54,6 +43,10 @@ const Dashboard = () => {
       type: "LOGOUT",
     });
   };
+
+  useEffect(() => {
+    fetchGoals({ token });
+  }, [token]);
 
   return (
     <div className="relative h-screen flex overflow-hidden bg-gray-100">
@@ -105,11 +98,7 @@ const Dashboard = () => {
                 </div>
               </Transition.Child>
               <div className="flex-shrink-0 flex items-center px-4">
-                <img
-                  className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/easywire-logo-cyan-300-mark-white-text.svg"
-                  alt="Easywire logo"
-                />
+                <img className="h-8 w-auto" src={logo} alt="goalbook logo" />
               </div>
               <nav
                 className="mt-5 flex-shrink-0 h-full divide-y divide-cyan-800 overflow-y-auto"
@@ -169,9 +158,10 @@ const Dashboard = () => {
           <div className="flex flex-col flex-grow bg-cyan-700 pt-5 pb-4 overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
               <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/easywire-logo-cyan-300-mark-white-text.svg"
-                alt="Easywire logo"
+                className="w-auto"
+                src={logo}
+                alt="goalbook logo"
+                id="logo"
               />
             </div>
             <nav
@@ -366,30 +356,9 @@ const Dashboard = () => {
               </h2>
               <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {goals &&
-                  goals.map((goal) => (
-                    <div
-                      key={goal.name}
-                      className="bg-white overflow-hidden shadow rounded-lg"
-                    >
-                      <div className="p-5">
-                        <div className="flex items-center">
-                          <div className="ml-5 w-0 flex-1">
-                            <dl>
-                              <dt className="text-sm font-medium text-gray-500 truncate">
-                                {goal.name}
-                              </dt>
-                              <dd>
-                                <div className="text-lg font-medium text-gray-900">
-                                  {goal.content}
-                                </div>
-                              </dd>
-                            </dl>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bg-gray-50 px-5 py-3"></div>
-                    </div>
-                  ))}
+                  goals
+                    .filter((goals) => goals.period === "WEEKLY")
+                    .map((goal, i) => <Card key={i} goal={goal} />)}
                 <NewGoalButton
                   setType={setType}
                   type="WEEKLY"
@@ -406,30 +375,9 @@ const Dashboard = () => {
                 </h2>
                 <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {goals &&
-                    goals.map((goal) => (
-                      <div
-                        key={goal.name}
-                        className="bg-white overflow-hidden shadow rounded-lg"
-                      >
-                        <div className="p-5">
-                          <div className="flex items-center">
-                            <div className="ml-5 w-0 flex-1">
-                              <dl>
-                                <dt className="text-sm font-medium text-gray-500 truncate">
-                                  {goal.name}
-                                </dt>
-                                <dd>
-                                  <div className="text-lg font-medium text-gray-900">
-                                    {goal.content}
-                                  </div>
-                                </dd>
-                              </dl>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="bg-gray-50 px-5 py-3"></div>
-                      </div>
-                    ))}
+                    goals
+                      .filter((goals) => goals.period === "DAILY")
+                      .map((goal, i) => <Card key={i} goal={goal} />)}
                   <NewGoalButton
                     setType={setType}
                     type="DAILY"
@@ -446,6 +394,7 @@ const Dashboard = () => {
         showGoalModal={showGoalModal}
         setShowGoalModal={setShowGoalModal}
         type={type}
+        mode="CREATE"
       />
     </div>
   );
