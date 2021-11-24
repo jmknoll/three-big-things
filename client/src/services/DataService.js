@@ -39,7 +39,6 @@ const oauth = (params) => {
       return { result: res.data, error: null };
     })
     .catch((err) => {
-      console.log("catch", err);
       return { result: null, error: err };
     });
 };
@@ -58,25 +57,32 @@ const fetchUser = (params) => {
 };
 
 const fetchGoals = (params) => {
-  return axios.get(`${process.env.REACT_APP_BASE_URL}/goals`, {
-    headers: {
-      "Content-type": "application/json",
-      "x-access-token": params.token,
-    },
-  });
-};
-
-const createGoal = (params) => {
-  return axios.post(
-    `${process.env.REACT_APP_BASE_URL}/goals`,
-    { period: "daily", content: params.goal },
-    {
+  return axios
+    .get(`${process.env.REACT_APP_BASE_URL}/goals`, {
       headers: {
         "Content-type": "application/json",
         "x-access-token": params.token,
       },
-    }
-  );
+    })
+    .then((res) => ({ data: res.data, error: null }))
+    .catch((err) => ({ data: null, error: err }));
+};
+
+const createGoal = (params) => {
+  const { goal } = params;
+  return axios
+    .post(
+      `${process.env.REACT_APP_BASE_URL}/goals`,
+      { ...goal },
+      {
+        headers: {
+          "Content-type": "application/json",
+          "x-access-token": params.token,
+        },
+      }
+    )
+    .then((res) => ({ data: res.data, error: null }))
+    .catch((err) => ({ data: null, error: err }));
 };
 
 const removeGoal = (params) => {

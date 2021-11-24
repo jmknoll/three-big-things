@@ -15,8 +15,6 @@ const dbConfig = {
 };
 
 module.exports = {
-  dbConfig,
-  // Keys map to process.env.NODE_ENV
   development: {
     ...dbConfig,
     dialect: "postgresql",

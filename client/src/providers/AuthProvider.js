@@ -1,5 +1,4 @@
 import React, { useEffect, useReducer } from "react";
-import ProtectedRoute from "../components/ProtectedRoute";
 import dataService from "../services/DataService";
 
 const AuthContext = React.createContext();
@@ -21,7 +20,6 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "LOGIN":
-      console.log("logging in", action.payload);
       localStorage.setItem("user", JSON.stringify(action.payload.user));
       localStorage.setItem("token", JSON.stringify(action.payload.token));
       return {
