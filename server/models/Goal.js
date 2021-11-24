@@ -11,11 +11,19 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.UUID,
         allowNull: false,
       },
+      name: {
+        type: Sequelize.TEXT,
+        required: true,
+      },
       content: {
         type: Sequelize.TEXT,
         required: true,
       },
       period: {
+        type: Sequelize.TEXT,
+        required: true,
+      },
+      status: {
         type: Sequelize.TEXT,
         required: true,
       },

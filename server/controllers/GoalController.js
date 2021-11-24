@@ -1,7 +1,7 @@
 const db = require("../models");
 const Goal = db.Goal;
 
-function create(req, res) {
+async function create(req, res) {
   if (!req.body.content) {
     res.status(400).send({
       message: "Content can not be empty!",
@@ -9,17 +9,22 @@ function create(req, res) {
     return;
   }
 
-  Goal.create({
-    user_id: req.user_id,
-    content: req.body.content,
-    period: req.body.period,
-  })
-    .then((goal) => {
-      res.status(201).send(goal);
-    })
-    .catch((e) => {
-      res.status(500).send({ error: e.message || "Error creating goal." });
-    });
+  try {
+    const [record, created] = await Goal.upsert(
+      {
+        id: req.body.id,
+        user_id: req.user_id,
+        name: req.body.name,
+        content: req.body.content,
+        period: req.body.period,
+        status: req.body.status,
+      },
+      { returning: true }
+    );
+    res.status(200).send(record);
+  } catch (err) {
+    res.status(500).send({ error: e.message || "Error creating goal." });
+  }
 }
 
 function findAll(req, res) {
@@ -27,6 +32,7 @@ function findAll(req, res) {
     where: {
       user_id: req.user_id,
     },
+    order: [["updatedAt", "DESC"]],
   })
     .then((data) => res.status(201).send(data))
     .catch((e) => {
