@@ -35,6 +35,19 @@ module.exports = (sequelize, Sequelize) => {
         },
         defaultValue: uuidv1(),
       },
+      last_login: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: sequelize.fn("NOW"),
+      },
+      timezone_offset: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      streak: {
+        type: Sequelize.INTEGER,
+        defaultValue: 1,
+      },
     },
     {
       underscored: true,

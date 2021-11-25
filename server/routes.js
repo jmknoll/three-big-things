@@ -25,13 +25,14 @@ module.exports = (app) => {
   }
 
   router.get("/", (req, res) => {
-    res.json({ message: "Welcome to three big things." });
+    res.json({ message: "Welcome to Goalbook." });
   });
 
   router.get(
     "/me",
     verifyToken,
     userCtrl.me,
+    userCtrl.updateAccountDetails,
     authCtrl.generateJWT,
     authCtrl.returnJWT
   );
