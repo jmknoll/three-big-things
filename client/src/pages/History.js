@@ -18,14 +18,12 @@ const History = (props) => {
     fetchGoals({ token, archived: true });
   }, [token]);
 
-  // const hrDuration = (val) => {
-  //   durationSelectorOptions.find(el);
-  // };
-
   return (
     <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="mt-8 mb-4 text-2xl">History</h2>
+        <h2 className="mt-8 mb-4 text-2xl font-medium text-gray-900">
+          History
+        </h2>
         <div className="flex flex-col">
           <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -79,7 +77,10 @@ const History = (props) => {
                           {goal.content}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {moment(goal.created_at).format("MM/DD/YYYY")}
+                          {moment
+                            .utc(goal.createdAt)
+                            .subtract(user.timezone_offset, "minutes")
+                            .format("MM/DD/YYYY")}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {

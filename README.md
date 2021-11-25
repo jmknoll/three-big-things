@@ -14,3 +14,12 @@ Get started by thinking of three things that you want to achieve this week. No m
 
 Frontend: https://github.com/jmknoll/three-big-things/tree/master/client
 Backend: https://github.com/jmknoll/three-big-things/tree/master/server
+
+### To Do
+
+0. Build manual archival experience
+1. Build detail page
+2. Build search endpoint with links to detail page
+3. Build history / related cards on detail page
+4. Rollup projects into goals (also good for realted goals)
+5. Rework frontend authentication

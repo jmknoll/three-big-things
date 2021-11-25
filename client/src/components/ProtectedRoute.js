@@ -6,8 +6,6 @@ const ProtectedRoute = ({ children, ...rest }) => {
   const { state } = useAuth();
   const { isAuthenticated } = state;
 
-  console.log("protected router is auth", isAuthenticated);
-
   return (
     <Route
       {...rest}
@@ -16,7 +14,9 @@ const ProtectedRoute = ({ children, ...rest }) => {
           return children;
         }
         if (!isAuthenticated) {
-          return <Redirect to="/login" />;
+          return (
+            <Redirect to={`/login?afterLogin=${window.location.pathname}`} />
+          );
         }
         return <div>Loading...</div>;
       }}

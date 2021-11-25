@@ -12,7 +12,7 @@ export const NewGoalModal = (props) => {
   } = useAuth();
 
   const {
-    dispatch: { createGoal },
+    dispatch: { createGoal, editGoal },
   } = useData();
 
   const defaultGoal = {
@@ -22,6 +22,7 @@ export const NewGoalModal = (props) => {
   };
 
   const [goal, setGoal] = useState(props.goal || defaultGoal);
+  const [error, setError] = useState("");
 
   const { showGoalModal, setShowGoalModal } = props;
   const cancelButtonRef = useRef(null);
@@ -42,6 +43,20 @@ export const NewGoalModal = (props) => {
 
   const _createGoal = () => {
     createGoal({ token, goal });
+    setShowGoalModal(false);
+    setGoal(defaultGoal);
+  };
+
+  const _archiveGoal = () => {
+    setError("");
+    if (goal.status === "IN_PROGRESS") {
+      setError(
+        "Please set status to Complete or Incomplete in order to archive"
+      );
+      return;
+    }
+    goal.archived = true;
+    editGoal({ token, goal });
     setShowGoalModal(false);
     setGoal(defaultGoal);
   };
@@ -153,14 +168,25 @@ export const NewGoalModal = (props) => {
                   </div>
                 </div>
               </div>
+              {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
               <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
-                  onClick={() => _createGoal()}
-                >
-                  Save
-                </button>
+                {props.source === "inbox" ? (
+                  <button
+                    type="button"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
+                    onClick={() => _createGoal()}
+                  >
+                    Archive
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
+                    onClick={() => _archiveGoal()}
+                  >
+                    Archive
+                  </button>
+                )}
                 <button
                   type="button"
                   className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"

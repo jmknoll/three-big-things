@@ -7,7 +7,8 @@ import { useData } from "../providers/DataProvider";
 import { useAuth } from "../providers/AuthProvider";
 import { NewGoalModal } from "./NewGoalModal";
 
-const Card = ({ goal }) => {
+const Card = (props) => {
+  const { goal } = props;
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
 
@@ -72,6 +73,7 @@ const Card = ({ goal }) => {
           setShowGoalModal={setShowGoalModal}
           type={goal.period}
           goal={goal}
+          sourc={props.source}
         />
       )}
     </div>

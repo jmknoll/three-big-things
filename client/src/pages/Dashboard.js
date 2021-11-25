@@ -1,14 +1,13 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { MenuAlt1Icon } from "@heroicons/react/outline";
+import moment from "moment";
+import { Link } from "react-router-dom";
 
 import { useAuth } from "../providers/AuthProvider";
 import { useData } from "../providers/DataProvider";
 import { NewGoalButton } from "../components/NewGoalButton";
 import { NewGoalModal } from "../components/NewGoalModal";
-import Navigation from "../components/Navigation";
 import Card from "../components/Card";
 import Alert from "../components/Alert";
-import Search from "../components/Search";
 import { Placeholder } from "../components/Avatar";
 
 const Dashboard = () => {
@@ -23,21 +22,32 @@ const Dashboard = () => {
   const [type, setType] = useState("WEEKLY");
 
   const [showGoalModal, setShowGoalModal] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchGoals({ token, archived: false });
   }, [token]);
 
-  const [weeklyGoals, dailyGoals] =
+  const [inbox, weeklyGoals, dailyGoals] =
     goals &&
     goals.reduce(
       (acc, curr) => {
-        const i = curr.period === "WEEKLY" ? 0 : 1;
+        let i;
+        const created = moment
+          .utc(curr.createdAt)
+          .subtract(user.timezone_offset, "minutes");
+        const now = moment();
+        if (curr.period === "DAILY" && !created.isSame(now, "day")) {
+          i = 0;
+        } else if (curr.period === "WEEKLY" && !created.isSame(now, "week")) {
+          i = 0;
+        } else {
+          i = curr.period === "WEEKLY" ? 1 : 2;
+        }
+
         acc[i] = [...acc[i], curr];
         return acc;
       },
-      [[], []]
+      [[], [], []]
     );
 
   return (
@@ -64,45 +74,79 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="mt-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-lg leading-6 font-medium text-gray-900">
-            Weekly Goals
-          </h2>
-          {weeklyGoals.length > 3 && <Alert content={alertContent} />}
-          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {weeklyGoals.map((goal, i) => (
-              <Card key={i} goal={goal} />
-            ))}
-            <NewGoalButton
-              setType={setType}
-              type="WEEKLY"
-              showGoalModal={showGoalModal}
-              setShowGoalModal={setShowGoalModal}
-            />
-          </div>
-        </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 my-6">
+        {inbox.length > 0 && (
+          <Alert content={inboxAlertContent} type="WARNING" />
+        )}
 
-        <div className="mt-8">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-lg leading-6 font-medium text-gray-900">
+        <div className="mt-6">
+          <div className="my-4 flex items-center">
+            <h2 className="text-xl font-medium text-gray-900 mr-4">
               Daily Goals
             </h2>
-            {dailyGoals.length > 3 && <Alert content={alertContent} />}
-            <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {dailyGoals.map((goal, i) => (
-                <Card key={i} goal={goal} />
-              ))}
+            {dailyGoals.length > 2 && (
+              <NewGoalButton
+                setType={setType}
+                type="DAILY"
+                showGoalModal={showGoalModal}
+                setShowGoalModal={setShowGoalModal}
+                size="sm"
+              />
+            )}
+          </div>
+          {dailyGoals.length > 3 && (
+            <Alert content={alertContent} type="WARNING" />
+          )}
+          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {dailyGoals.map((goal, i) => (
+              <Card key={i} goal={goal} />
+            ))}
+            {dailyGoals.length < 3 && (
               <NewGoalButton
                 setType={setType}
                 type="DAILY"
                 showGoalModal={showGoalModal}
                 setShowGoalModal={setShowGoalModal}
               />
-            </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <div className="my-4 flex items-center">
+            <h2 className="text-xl font-medium text-gray-900 mr-4">
+              Weekly Goals
+            </h2>
+            {weeklyGoals.length > 2 && (
+              <NewGoalButton
+                setType={setType}
+                type="WEEKLY"
+                showGoalModal={showGoalModal}
+                setShowGoalModal={setShowGoalModal}
+                size="sm"
+              />
+            )}
+          </div>
+          {weeklyGoals.length > 3 && (
+            <Alert content={alertContent} type="WARNING" />
+          )}
+          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {weeklyGoals.map((goal, i) => (
+              <Card key={i} goal={goal} />
+            ))}
+            {weeklyGoals.length < 3 && (
+              <NewGoalButton
+                setType={setType}
+                type="WEEKLY"
+                showGoalModal={showGoalModal}
+                setShowGoalModal={setShowGoalModal}
+                size="lg"
+              />
+            )}
           </div>
         </div>
       </div>
+
       <NewGoalModal
         showGoalModal={showGoalModal}
         setShowGoalModal={setShowGoalModal}
@@ -125,6 +169,14 @@ const alertContent = () => (
       The Rule of Three
     </a>{" "}
     for more info.
+  </p>
+);
+
+const inboxAlertContent = () => (
+  <p>
+    You have expired records in your inbox. Processing and archiving them will
+    help you build better analytics. <Link to="/inbox">Click here</Link> to view
+    your inbox.
   </p>
 );
 

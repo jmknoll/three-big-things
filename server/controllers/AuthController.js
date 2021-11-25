@@ -23,7 +23,15 @@ async function oauth(req, res, next) {
         name,
         timezone_offset: tzOffset,
       },
-      attributes: ["id", "name", "email", "refresh_token"],
+      attributes: [
+        "id",
+        "name",
+        "email",
+        "refresh_token",
+        "timezone_offset",
+        "streak",
+        "last_login",
+      ],
     });
 
     req.dbUser = user[0];
