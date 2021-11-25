@@ -53,7 +53,6 @@ async function updateAccountDetails(req, res, next) {
     const diff = now_day - last_day;
 
     if (diff !== 0) {
-      console.log("bonesaw is ready");
       let newStreak = 0;
       if (diff === 1 || (now_day === 1 && diff === -364)) {
         newStreak = req.dbUser.streak + 1;

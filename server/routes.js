@@ -53,7 +53,12 @@ module.exports = (app) => {
     authCtrl.returnJWT
   );
 
-  router.get("/goals", verifyToken, goalCtrl.findAll);
+  router.get(
+    "/goals",
+    verifyToken,
+    goalCtrl.updateGoalStatus,
+    goalCtrl.findAll
+  );
   router.post("/goals", verifyToken, goalCtrl.create);
   router.delete("/goals/:id", verifyToken, goalCtrl.destroy);
 
