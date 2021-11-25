@@ -23,11 +23,13 @@ const signin = (params) => {
 
 const oauth = (params) => {
   const { token } = params;
+  const tzOffset = new Date().getTimezoneOffset();
   return axios
     .post(
       `${process.env.REACT_APP_BASE_URL}/oauth`,
       {
         token,
+        tzOffset,
       },
       {
         headers: {
@@ -45,8 +47,9 @@ const oauth = (params) => {
 
 const fetchUser = (params) => {
   const { token } = params;
+  const tzOffset = new Date().getTimezoneOffset();
   return axios
-    .get(`${process.env.REACT_APP_BASE_URL}/me`, {
+    .get(`${process.env.REACT_APP_BASE_URL}/me?tzOffset=${tzOffset}`, {
       headers: {
         "Content-type": "application/json",
         "x-access-token": token,
@@ -58,12 +61,17 @@ const fetchUser = (params) => {
 
 const fetchGoals = (params) => {
   return axios
-    .get(`${process.env.REACT_APP_BASE_URL}/goals`, {
-      headers: {
-        "Content-type": "application/json",
-        "x-access-token": params.token,
-      },
-    })
+    .get(
+      `${process.env.REACT_APP_BASE_URL}/goals?archived=${
+        params.archived || false
+      }`,
+      {
+        headers: {
+          "Content-type": "application/json",
+          "x-access-token": params.token,
+        },
+      }
+    )
     .then((res) => ({ data: res.data, error: null }))
     .catch((err) => ({ data: null, error: err }));
 };

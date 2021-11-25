@@ -27,6 +27,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         required: true,
       },
+      archived: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
     },
     {
       underscored: true,

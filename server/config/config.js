@@ -18,10 +18,14 @@ module.exports = {
   development: {
     ...dbConfig,
     dialect: "postgresql",
+    keepDefaultTimezone: false,
+    timezone: "+00:00",
   },
   staging: {
     ...dbConfig,
     dialect: "postgresql",
+    keepDefaultTimezone: false,
+    timezone: "+00:00",
     dialectOptions: {
       ssl: {
         rejectUnauthorized: false,
@@ -32,6 +36,8 @@ module.exports = {
     use_env_variable: "DATABASE_URL",
     ...dbConfig,
     dialect: "postgresql",
+    keepDefaultTimezone: false,
+    timezone: "+00:00",
     dialectOptions: {
       ssl: {
         rejectUnauthorized: false,

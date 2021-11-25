@@ -25,13 +25,14 @@ module.exports = (app) => {
   }
 
   router.get("/", (req, res) => {
-    res.json({ message: "Welcome to three big things." });
+    res.json({ message: "Welcome to Goalbook." });
   });
 
   router.get(
     "/me",
     verifyToken,
     userCtrl.me,
+    userCtrl.updateAccountDetails,
     authCtrl.generateJWT,
     authCtrl.returnJWT
   );
@@ -52,7 +53,12 @@ module.exports = (app) => {
     authCtrl.returnJWT
   );
 
-  router.get("/goals", verifyToken, goalCtrl.findAll);
+  router.get(
+    "/goals",
+    verifyToken,
+    goalCtrl.updateGoalStatus,
+    goalCtrl.findAll
+  );
   router.post("/goals", verifyToken, goalCtrl.create);
   router.delete("/goals/:id", verifyToken, goalCtrl.destroy);
 

@@ -7,7 +7,7 @@ const User = db.User;
 async function oauth(req, res, next) {
   try {
     const client = new OAuth2Client(process.env.GAPI_CLIENT_ID);
-    const { token } = req.body;
+    const { token, tzOffset } = req.body;
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GAPI_CLIENT_ID,
@@ -21,15 +21,12 @@ async function oauth(req, res, next) {
       defaults: {
         email,
         name,
+        timezone_offset: tzOffset,
       },
       attributes: ["id", "name", "email", "refresh_token"],
     });
 
-    console.log("user", user);
-
     req.dbUser = user[0];
-
-    console.log(req.dbUser);
 
     next();
   } catch (e) {
