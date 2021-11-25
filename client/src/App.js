@@ -9,6 +9,7 @@ import {
 import Layout from "./pages/Layout";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
+import History from "./pages/History";
 import NoMatch from "./pages/404";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -27,6 +28,9 @@ function App() {
               </Route>
               <ProtectedRoute path="/dashboard">
                 <Dashboard />
+              </ProtectedRoute>
+              <ProtectedRoute path="/history">
+                <History />
               </ProtectedRoute>
               <Route path="/">
                 <Home />

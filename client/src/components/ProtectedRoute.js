@@ -6,6 +6,8 @@ const ProtectedRoute = ({ children, ...rest }) => {
   const { state } = useAuth();
   const { isAuthenticated } = state;
 
+  console.log("protected router is auth", isAuthenticated);
+
   return (
     <Route
       {...rest}

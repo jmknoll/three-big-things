@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from "react";
 import { withRouter, Redirect } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import SigninModal from "../components/SigninModal";
 
 import { useAuth } from "../providers/AuthProvider";
@@ -8,12 +7,11 @@ import { useAuth } from "../providers/AuthProvider";
 const Home = (props) => {
   const [showModal, setShowModal] = useState(false);
 
-  const { state, dispatch } = useAuth(null);
+  const { state } = useAuth(null);
   const { isAuthenticated } = state;
 
   return (
     <>
-      <Navbar></Navbar>
       <div className="relative bg-gray-50 overflow-hidden">
         {isAuthenticated ? <Redirect to="/dashboard" /> : null}
         <div
