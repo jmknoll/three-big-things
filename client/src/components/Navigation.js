@@ -143,9 +143,9 @@ const Navigation = (props) => {
             >
               <div className="px-2 space-y-1">
                 {navigationLinks.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.href}
                     className={classNames(
                       item.current
                         ? "bg-cyan-800 text-white"
@@ -159,13 +159,13 @@ const Navigation = (props) => {
                       aria-hidden="true"
                     />
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
               <div className="mt-6 pt-6">
                 <div className="px-2 space-y-1">
                   {secondaryNavigationLinks.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
                       href={item.href}
                       className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
@@ -175,7 +175,7 @@ const Navigation = (props) => {
                         aria-hidden="true"
                       />
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>

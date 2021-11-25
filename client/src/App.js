@@ -29,9 +29,9 @@ function App() {
               <ProtectedRoute path="/dashboard">
                 <Dashboard />
               </ProtectedRoute>
-              <ProtectedRoute path="/history">
+              <Route path="/history">
                 <History />
-              </ProtectedRoute>
+              </Route>
               <Route path="/">
                 <Home />
               </Route>

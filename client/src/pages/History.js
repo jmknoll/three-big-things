@@ -3,26 +3,18 @@ import { MenuAlt1Icon } from "@heroicons/react/outline";
 
 import { useAuth } from "../providers/AuthProvider";
 import { useData } from "../providers/DataProvider";
-import { NewGoalButton } from "../components/NewGoalButton";
-import { NewGoalModal } from "../components/NewGoalModal";
 import Navigation from "../components/Navigation";
-import Card from "../components/Card";
-import Alert from "../components/Alert";
 import Search from "../components/Search";
-import { Placeholder } from "../components/Avatar";
 
 const History = (props) => {
   const {
     state: { user, token },
   } = useAuth();
   const {
-    state: { goals },
+    state: { archivedGoals: goals },
     dispatch: { fetchGoals },
   } = useData();
 
-  const [type, setType] = useState("WEEKLY");
-
-  const [showGoalModal, setShowGoalModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {

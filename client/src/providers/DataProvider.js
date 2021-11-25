@@ -15,6 +15,7 @@ const initialGoal = {};
 
 const initialState = {
   goals: [],
+  archivedGoals: [],
   goal: initialGoal,
 };
 
@@ -28,11 +29,15 @@ const DataProvider = (props) => {
     });
   };
 
-  const fetchGoals = ({ token }) => {
+  const fetchGoals = ({ token, archived }) => {
     dataService
-      .fetchGoals({ token: token })
+      .fetchGoals({ token, archived })
       .then((res) => {
-        updateState("goals", res.data);
+        if (archived) {
+          updateState("archivedGoals", res.data);
+        } else {
+          updateState("goals", res.data);
+        }
       })
       .catch((err) => {
         console.log(err);
