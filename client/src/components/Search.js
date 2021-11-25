@@ -10,7 +10,8 @@ import { useAuth } from "../providers/AuthProvider";
 import { Avatar } from "../components/Avatar";
 import { classNames } from "../utils";
 
-const Search = () => {
+const Search = (props) => {
+  const { withSearch } = props;
   const {
     state: { user },
     dispatch,
@@ -26,24 +27,28 @@ const Search = () => {
     <div className="flex-1 px-4 flex justify-between sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
       <div className="flex-1 flex">
         <form className="w-full flex md:ml-0" action="#" method="GET">
-          <label htmlFor="search-field" className="sr-only">
-            Search
-          </label>
-          <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-            <div
-              className="absolute inset-y-0 left-0 flex items-center pointer-events-none"
-              aria-hidden="true"
-            >
-              <SearchIcon className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <input
-              id="search-field"
-              name="search-field"
-              className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
-              placeholder="Search goals..."
-              type="search"
-            />
-          </div>
+          {withSearch && (
+            <>
+              <label htmlFor="search-field" className="sr-only">
+                Search
+              </label>
+              <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+                <div
+                  className="absolute inset-y-0 left-0 flex items-center pointer-events-none"
+                  aria-hidden="true"
+                >
+                  <SearchIcon className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <input
+                  id="search-field"
+                  name="search-field"
+                  className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
+                  placeholder="Search goals..."
+                  type="search"
+                />
+              </div>
+            </>
+          )}
         </form>
       </div>
       <div className="ml-4 flex items-center md:ml-6">
@@ -61,7 +66,7 @@ const Search = () => {
             <Menu.Button className="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50">
               <span className="hidden ml-3 text-gray-700 text-sm font-medium lg:block">
                 <span className="sr-only">Open user menu for </span>
-                <Avatar name={user.name} />
+                <Avatar name={user?.name} />
               </span>
               <ChevronDownIcon
                 className="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"

@@ -86,7 +86,7 @@ export const NewGoalModal = (props) => {
           >
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-7 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
               <h3 className="text-lg mb-4 font-medium text-gray-900">
-                Add a New Goal
+                {props.goal ? "Edit" : "Add New"} Goal
               </h3>
               <div>
                 <label

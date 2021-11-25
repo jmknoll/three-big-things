@@ -6,16 +6,29 @@ import { Link } from "react-router-dom";
 import { classNames } from "../utils";
 import logo from "../assets/logo_transparent.png";
 
-const navigationLinks = [
-  { name: "Home", href: "/dashboard", icon: HomeIcon, current: true },
-  { name: "History", href: "/history", icon: ClockIcon, current: false },
-];
-const secondaryNavigationLinks = [
-  { name: "Settings", href: "#", icon: CogIcon },
-];
-
 const Navigation = (props) => {
   const { sidebarOpen, setSidebarOpen } = props;
+
+  const isCurrent = (route) => {
+    let re = new RegExp(route.href);
+    return { ...route, current: re.test(window.location) };
+  };
+
+  const navigationLinks = [
+    {
+      name: "Home",
+      href: "/dashboard",
+      icon: HomeIcon,
+      current: false,
+    },
+    { name: "History", href: "/history", icon: ClockIcon, current: false },
+  ].map(isCurrent);
+
+  console.log("navlinks", navigationLinks);
+
+  const secondaryNavigationLinks = [
+    { name: "Settings", href: "/settings", icon: CogIcon, current: false },
+  ].map(isCurrent);
 
   return (
     <>
@@ -105,7 +118,12 @@ const Navigation = (props) => {
                       <Link
                         key={item.name}
                         to={item.href}
-                        className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
+                        className={classNames(
+                          item.current
+                            ? "bg-cyan-800 text-white"
+                            : "text-cyan-100 hover:text-white hover:bg-cyan-600",
+                          "group flex items-center px-2 py-2 text-base font-medium rounded-md"
+                        )}
                       >
                         <item.icon
                           className="mr-4 h-6 w-6 text-cyan-200"
@@ -167,8 +185,13 @@ const Navigation = (props) => {
                   {secondaryNavigationLinks.map((item) => (
                     <Link
                       key={item.name}
-                      href={item.href}
-                      className="group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md text-cyan-100 hover:text-white hover:bg-cyan-600"
+                      to={item.href}
+                      className={classNames(
+                        item.current
+                          ? "bg-cyan-800 text-white"
+                          : "text-cyan-100 hover:text-white hover:bg-cyan-600",
+                        "group flex items-center px-2 py-2 text-sm leading-6 font-medium rounded-md"
+                      )}
                     >
                       <item.icon
                         className="mr-4 h-6 w-6 text-cyan-200"

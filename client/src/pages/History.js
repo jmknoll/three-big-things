@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { MenuAlt1Icon } from "@heroicons/react/outline";
 
 import { useAuth } from "../providers/AuthProvider";
 import { useData } from "../providers/DataProvider";
-import Navigation from "../components/Navigation";
-import Search from "../components/Search";
+import { durationSelectorOptions, statuses } from "../constants";
+import moment from "moment";
 
 const History = (props) => {
   const {
@@ -15,45 +14,104 @@ const History = (props) => {
     dispatch: { fetchGoals },
   } = useData();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   useEffect(() => {
     fetchGoals({ token, archived: true });
   }, [token]);
 
+  // const hrDuration = (val) => {
+  //   durationSelectorOptions.find(el);
+  // };
+
   return (
-    <div className="relative h-screen flex overflow-hidden bg-gray-100">
-      <Navigation sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-      <div className="flex-1 overflow-auto focus:outline-none">
-        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
-          <button
-            type="button"
-            className="px-4 border-r border-gray-200 text-gray-400 focus:outline-no ne focus:ring-2 focus:ring-inset focus:ring-cyan-500 lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <span className="sr-only">Open sidebar</span>
-            <MenuAlt1Icon className="h-6 w-6" aria-hidden="true" />
-          </button>
-          <Search />
-        </div>
-
-        <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
-          <div>
-            <h2>History Page</h2>
-            {goals &&
-              goals.map((goal, i) => {
-                return (
-                  <div>
-                    <p>{goal.name}</p>
-                    <p>{goal.content}</p>
-                  </div>
-                );
-              })}
+    <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="mt-8 mb-4 text-2xl">History</h2>
+        <div className="flex flex-col">
+          <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+              <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Name
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Description
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Date Created
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Duration
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Status
+                      </th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {goals.map((goal, i) => (
+                      <tr
+                        key={i}
+                        className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {goal.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {goal.content}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {moment(goal.created_at).format("MM/DD/YYYY")}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {
+                            durationSelectorOptions.find(
+                              (el) => el.value === goal.period
+                            )?.label
+                          }
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {
+                            statuses.find((el) => el.value === goal.status)
+                              ?.label
+                          }
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <a
+                            href="#"
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            Edit
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 
