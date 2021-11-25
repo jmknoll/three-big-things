@@ -1,5 +1,6 @@
 server/.env
 server/node_modules/
+server/access.log
 
 client/node_modules/
 client/.env
