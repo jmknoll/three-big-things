@@ -93,6 +93,23 @@ const createGoal = (params) => {
     .catch((err) => ({ data: null, error: err }));
 };
 
+const editGoal = (params) => {
+  const { goal } = params;
+  return axios
+    .put(
+      `${process.env.REACT_APP_BASE_URL}/goals/${goal.id}`,
+      { ...goal },
+      {
+        headers: {
+          "Content-type": "application/json",
+          "x-access-token": params.token,
+        },
+      }
+    )
+    .then((res) => ({ data: res.data, error: null }))
+    .catch((err) => ({ data: null, error: err }));
+};
+
 const removeGoal = (params) => {
   return axios.delete(
     `${process.env.REACT_APP_BASE_URL}/goals/${params.goal.id}`,
@@ -111,6 +128,7 @@ const dataService = {
   fetchUser,
   fetchGoals,
   createGoal,
+  editGoal,
   removeGoal,
 };
 

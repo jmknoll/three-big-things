@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import History from "./pages/History";
 import Settings from "./pages/Settings";
+import Inbox from "./pages/Inbox";
 import NoMatch from "./pages/404";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -30,6 +31,11 @@ function App() {
             <ProtectedRoute path="/dashboard">
               <Layout withSearch={true}>
                 <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+            <ProtectedRoute path="/inbox">
+              <Layout withSearch={true}>
+                <Inbox />
               </Layout>
             </ProtectedRoute>
             <ProtectedRoute path="/history">

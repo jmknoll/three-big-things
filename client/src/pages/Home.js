@@ -10,6 +10,10 @@ const Home = (props) => {
   const { state } = useAuth(null);
   const { isAuthenticated } = state;
 
+  const params = new URLSearchParams(window.location);
+  const afterLogin = params.get("afterLogin");
+  console.log("al", afterLogin);
+
   return (
     <>
       <div className="relative bg-gray-50 overflow-hidden">

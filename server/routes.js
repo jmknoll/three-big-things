@@ -60,6 +60,7 @@ module.exports = (app) => {
     goalCtrl.findAll
   );
   router.post("/goals", verifyToken, goalCtrl.create);
+  router.put("/goals/:id", verifyToken, goalCtrl.update);
   router.delete("/goals/:id", verifyToken, goalCtrl.destroy);
 
   app.use("/", router);

@@ -54,13 +54,27 @@ const DataProvider = (props) => {
           index > -1
             ? Object.assign([], state.goals, { [index]: res.data })
             : [...state.goals, res.data];
-        console.log(goals);
         updateState("goals", goals);
         updateState("goal", {});
       })
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const editGoal = async ({ goal, token }) => {
+    try {
+      let { data, error } = await dataService.editGoal({ token, goal });
+      if (data && !error) {
+        data = data[0];
+        const goals = state.goals.filter(
+          (goal) => goal.id !== parseInt(data.id)
+        );
+        updateState("goals", goals);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const removeGoal = ({ goal, token }) => {
@@ -80,6 +94,7 @@ const DataProvider = (props) => {
   const dispatch = {
     fetchGoals,
     createGoal,
+    editGoal,
     removeGoal,
   };
 

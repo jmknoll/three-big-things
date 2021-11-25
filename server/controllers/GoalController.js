@@ -24,7 +24,41 @@ async function create(req, res) {
       { returning: true }
     );
     res.status(200).send(record);
-  } catch (err) {
+  } catch (e) {
+    res.status(500).send({ error: e.message || "Error creating goal." });
+  }
+}
+
+async function update(req, res) {
+  const { id } = req.params;
+  if (!req.body.content) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+    return;
+  }
+
+  try {
+    const [status, created] = await Goal.update(
+      {
+        archived: req.body.archived,
+        name: req.body.name,
+        content: req.body.content,
+        period: req.body.period,
+        status: req.body.status,
+      },
+      {
+        where: {
+          id: id,
+        },
+        returning: true,
+        raw: true,
+      }
+    );
+    console.log("record", status);
+    console.log("creawted", created);
+    res.status(200).send(created);
+  } catch (e) {
     res.status(500).send({ error: e.message || "Error creating goal." });
   }
 }
@@ -44,30 +78,31 @@ function shouldArchive(record, timezone_offset) {
 }
 
 async function updateGoalStatus(req, res, next) {
-  const archived = JSON.parse(req.query.archived);
-  if (!archived) {
-    const user = await User.findByPk(req.user_id, { raw: true });
-    const goals = await Goal.findAll({
-      where: {
-        user_id: req.user_id,
-        archived,
-      },
-      raw: true,
-    });
-    ids = goals.map((goal) => shouldArchive(goal, user.timezone_offset));
-    console.log(ids);
-    await Goal.update(
-      {
-        archived: true,
-      },
-      {
-        where: {
-          id: ids,
-        },
-      }
-    );
-  }
   next();
+  // this is for automatic archiving - might come back later
+  // const archived = JSON.parse(req.query.archived);
+  // if (!archived) {
+  //   const user = await User.findByPk(req.user_id, { raw: true });
+  //   const goals = await Goal.findAll({
+  //     where: {
+  //       user_id: req.user_id,
+  //       archived,
+  //     },
+  //     raw: true,
+  //   });
+  //   ids = goals.map((goal) => shouldArchive(goal, user.timezone_offset));
+  //   await Goal.update(
+  //     {
+  //       archived: true,
+  //     },
+  //     {
+  //       where: {
+  //         id: ids,
+  //       },
+  //     }
+  //   );
+  // }
+  // next();
 }
 
 function findAll(req, res) {
@@ -101,6 +136,7 @@ function destroy(req, res) {
 
 module.exports = {
   create,
+  update,
   findAll,
   updateGoalStatus,
   destroy,

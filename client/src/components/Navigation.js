@@ -1,6 +1,12 @@
 import React, { useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { ClockIcon, CogIcon, HomeIcon, XIcon } from "@heroicons/react/outline";
+import {
+  ClockIcon,
+  CogIcon,
+  HomeIcon,
+  XIcon,
+  InboxIcon,
+} from "@heroicons/react/outline";
 import { Link } from "react-router-dom";
 
 import { classNames } from "../utils";
@@ -21,10 +27,9 @@ const Navigation = (props) => {
       icon: HomeIcon,
       current: false,
     },
+    { name: "Inbox", href: "/inbox", icon: InboxIcon, current: false },
     { name: "History", href: "/history", icon: ClockIcon, current: false },
   ].map(isCurrent);
-
-  console.log("navlinks", navigationLinks);
 
   const secondaryNavigationLinks = [
     { name: "Settings", href: "/settings", icon: CogIcon, current: false },
