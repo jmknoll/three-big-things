@@ -73,7 +73,7 @@ const Card = (props) => {
           setShowGoalModal={setShowGoalModal}
           type={goal.period}
           goal={goal}
-          sourc={props.source}
+          source={props.source}
         />
       )}
     </div>
