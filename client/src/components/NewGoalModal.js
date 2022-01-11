@@ -23,6 +23,7 @@ export const NewGoalModal = (props) => {
 
   const [goal, setGoal] = useState(props.goal || defaultGoal);
   const [error, setError] = useState("");
+  const [titleError, setTitleError] = useState(null);
 
   const { showGoalModal, setShowGoalModal } = props;
   const cancelButtonRef = useRef(null);
@@ -35,19 +36,30 @@ export const NewGoalModal = (props) => {
   }, [props.type]);
 
   const updateGoal = (key, value) => {
+    // this should be a better abstraction instead of a one off
+    if (key === "name" && value !== "") {
+      setTitleError(null);
+    }
+
     setGoal({
       ...goal,
       [key]: value,
     });
   };
 
-  const _createGoal = () => {
+  const _createGoal = (e) => {
+    e && e.preventDefault();
+    if (!goal.name || goal.name === "") {
+      setTitleError("Goal name is required");
+      return;
+    }
     createGoal({ token, goal });
     setShowGoalModal(false);
     setGoal(defaultGoal);
   };
 
-  const _archiveGoal = () => {
+  const _archiveGoal = (e) => {
+    e.preventDefault();
     setError("");
     if (goal.status === "IN_PROGRESS") {
       setError(
@@ -61,6 +73,13 @@ export const NewGoalModal = (props) => {
     setGoal(defaultGoal);
   };
 
+  const _handleClose = () => {
+    setShowGoalModal(false);
+    setError(null);
+    setTitleError(null);
+    setGoal(defaultGoal);
+  };
+
   return (
     <Transition.Root show={showGoalModal} as={Fragment}>
       <Dialog
@@ -68,7 +87,7 @@ export const NewGoalModal = (props) => {
         auto-reopen="true"
         className="fixed z-10 inset-0 overflow-y-auto"
         initialFocus={cancelButtonRef}
-        onClose={setShowGoalModal}
+        onClose={_handleClose}
       >
         <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
@@ -99,7 +118,13 @@ export const NewGoalModal = (props) => {
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-7 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <form
+              id="createGoalForm"
+              onSubmit={(e) => {
+                _createGoal(e);
+              }}
+              className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-7 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+            >
               <h3 className="text-lg mb-4 font-medium text-gray-900">
                 {props.goal ? "Edit" : "Add New"} Goal
               </h3>
@@ -115,19 +140,22 @@ export const NewGoalModal = (props) => {
                     type="text"
                     name="project-name"
                     id="project-name"
-                    className="block w-full shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm border-gray-300 rounded-md"
+                    className={`block w-full shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm border-gray-300 rounded-md +
+                      ${titleError ? " border-red-700" : ""}
+                    `}
                     value={goal.name}
                     onChange={(e) => {
                       updateGoal("name", e.target.value);
                     }}
                   />
+                  <div className="text-xs mt-1 text-red-700">{titleError}</div>
                 </div>
                 <div className="mt-4">
                   <label
                     htmlFor="description"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Description
+                    Description (Optional)
                   </label>
                   <div className="mt-1">
                     <textarea
@@ -138,6 +166,11 @@ export const NewGoalModal = (props) => {
                       value={goal.content}
                       onChange={(e) => {
                         updateGoal("content", e.target.value);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && e.metaKey) {
+                          _createGoal();
+                        }
                       }}
                     />
                   </div>
@@ -174,7 +207,7 @@ export const NewGoalModal = (props) => {
                   <button
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
-                    onClick={() => _archiveGoal()}
+                    onClick={(e) => _archiveGoal(e)}
                   >
                     Archive
                   </button>
@@ -182,7 +215,7 @@ export const NewGoalModal = (props) => {
                   <button
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
-                    onClick={() => _createGoal()}
+                    onClick={(e) => _createGoal(e)}
                   >
                     Create
                   </button>
@@ -190,13 +223,13 @@ export const NewGoalModal = (props) => {
                 <button
                   type="button"
                   className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-                  onClick={() => setShowGoalModal(false)}
+                  onClick={() => _handleClose()}
                   ref={cancelButtonRef}
                 >
                   Cancel
                 </button>
               </div>
-            </div>
+            </form>
           </Transition.Child>
         </div>
       </Dialog>

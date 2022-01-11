@@ -12,7 +12,6 @@ const Home = (props) => {
 
   const params = new URLSearchParams(window.location);
   const afterLogin = params.get("afterLogin");
-  console.log("al", afterLogin);
 
   return (
     <>

@@ -49,7 +49,7 @@ const Card = (props) => {
             </span>
           </div>
         </div>
-        <p class="mt-3 text-base text-gray-500">{goal.content}</p>
+        <p className="mt-3 text-base text-gray-500">{goal.content}</p>
         <div className="flex items-center mt-5">
           <span
             className={classNames(

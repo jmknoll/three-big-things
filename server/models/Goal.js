@@ -17,7 +17,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       content: {
         type: Sequelize.TEXT,
-        required: true,
+        required: false,
       },
       period: {
         type: Sequelize.TEXT,
