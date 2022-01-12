@@ -32,10 +32,11 @@ const Dashboard = () => {
     goals.reduce(
       (acc, curr) => {
         let i;
-        const created = moment
-          .utc(curr.createdAt)
-          .subtract(user.timezone_offset, "minutes");
+        const created = moment.utc(curr.createdAt);
+        // .subtract(user.timezone_offset, "minutes");
         const now = moment();
+        console.log("created", created);
+        console.log("now", now);
         if (curr.period === "DAILY" && !created.isSame(now, "day")) {
           i = 0;
         } else if (curr.period === "WEEKLY" && !created.isSame(now, "week")) {
@@ -49,6 +50,8 @@ const Dashboard = () => {
       },
       [[], [], []]
     );
+
+  console.log("user.tz", user.timezone_offset);
 
   return (
     <main className="flex-1 relative pb-8 z-0 overflow-y-auto">

@@ -17,9 +17,20 @@ Backend: https://github.com/jmknoll/three-big-things/tree/master/server
 
 ### To Do
 
-0. Build manual archival experience
-1. Build detail page
-2. Build search endpoint with links to detail page
-3. Build history / related cards on detail page
-4. Rollup projects into goals (also good for realted goals)
-5. Rework frontend authentication
+1.
+
+- Rework frontend authentication
+- Build landing page
+- Build history / related cards on detail page
+- Write deploy script
+- Figure out logging solution
+- Move architecture to digital ocean
+
+2.
+
+- Build card detail page
+- Rollup projects into goals (also good for realted goals)
+
+3.
+
+- Build search endpoint with links to detail page
