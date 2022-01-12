@@ -9,6 +9,7 @@ import { NewGoalModal } from "../components/NewGoalModal";
 import Card from "../components/Card";
 import Alert from "../components/Alert";
 import { Placeholder } from "../components/Avatar";
+import ReactMarkdown from "react-markdown";
 
 const Dashboard = () => {
   const {
@@ -87,6 +88,7 @@ const Dashboard = () => {
             <h2 className="text-xl font-medium text-gray-900 mr-4">
               Daily Goals
             </h2>
+
             {dailyGoals.length > 2 && (
               <NewGoalButton
                 setType={setType}

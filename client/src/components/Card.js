@@ -6,6 +6,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import { useData } from "../providers/DataProvider";
 import { useAuth } from "../providers/AuthProvider";
 import { NewGoalModal } from "./NewGoalModal";
+import ReactMarkdown from "react-markdown";
 
 const Card = (props) => {
   const { goal } = props;
@@ -49,7 +50,12 @@ const Card = (props) => {
             </span>
           </div>
         </div>
-        <p className="mt-3 text-base text-gray-500">{goal.content}</p>
+        {/* <p className="mt-3 text-base text-gray-500"> */}
+        <div className="prose mt-3 text-base text-gray-500">
+          <ReactMarkdown children={goal.content} />
+        </div>
+        {/* </p> */}
+
         <div className="flex items-center mt-5">
           <span
             className={classNames(

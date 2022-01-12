@@ -1,7 +1,7 @@
 import react, { useState } from "react";
 import { Avatar } from "./Avatar";
 import { CheckIcon, XIcon } from "@heroicons/react/outline";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
+import ReactMarkdown from "react-markdown";
 
 const InboxRow = ({ goal, editGoal }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -25,8 +25,8 @@ const InboxRow = ({ goal, editGoal }) => {
                   <p className="text-lg text-gray-800 font-medium truncate">
                     {goal.name}
                   </p>
-                  <p className="mt-2 flex items-center text-sm text-gray-500">
-                    <span className="truncate">{goal.content}</span>
+                  <p className="prose mt-2 text-sm text-gray-500">
+                    <ReactMarkdown children={goal.content} />
                   </p>
                 </div>
               </div>
