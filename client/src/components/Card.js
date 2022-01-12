@@ -29,7 +29,7 @@ const Card = (props) => {
     <div className="bg-white overflow-hidden shadow rounded-lg">
       <div className="p-5 h-full flex flex-col justify-between">
         <div className="flex flex-row justify-between">
-          <p className="text-xl font-semibold text-gray-900">{goal.name}</p>
+          <p className="text-xl font-medium text-gray-800">{goal.name}</p>
           <div className="flex flex-row">
             <span
               className="opacity-50 mr-2 cursor-pointer hover:opacity-70"
@@ -57,7 +57,9 @@ const Card = (props) => {
               "flex-shrink-0 inline-block h-2 w-2 rounded-full"
             )}
           />
-          <span className="ml-3 block truncate">{status.label}</span>
+          <span className="ml-3 block truncate text-base text-gray-800">
+            {status.label}
+          </span>
         </div>
       </div>
       {showConfirmation && (

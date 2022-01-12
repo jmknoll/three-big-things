@@ -6,8 +6,8 @@ export const Avatar = (props) => {
   const processInitials = (name) => {
     const names = name.split(" ");
     const first = names[0]?.substring(0, 1);
-    const last = names[names.length - 1]?.substring(0, 1);
-    return `${first}${last}`;
+    const last = names[1]?.substring(0, 1);
+    return `${first}${last || ""}`;
   };
 
   if (!name) {
@@ -16,7 +16,7 @@ export const Avatar = (props) => {
 
   return (
     <span
-      className={`inline-flex items-center justify-center h-${size} w-${size} rounded-full bg-cyan-700`}
+      className={`inline-flex items-center justify-center h-${size} w-${size} rounded-full ${props.color}`}
     >
       <span className="text-xs font-medium leading-none text-white">
         {processInitials(name)}
@@ -26,6 +26,7 @@ export const Avatar = (props) => {
 };
 
 Avatar.defaultProps = {
+  color: "bg-cyan-700",
   name: null,
   size: 8,
 };

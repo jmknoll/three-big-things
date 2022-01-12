@@ -9,3 +9,12 @@
 .alert a {
   text-decoration: underline;
 }
+
+.inbox-row-exit {
+  opacity: 1;
+}
+
+.inbox-row-exit-active {
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
+}

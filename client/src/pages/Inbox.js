@@ -4,8 +4,10 @@ import moment from "moment";
 import { useAuth } from "../providers/AuthProvider";
 import { useData } from "../providers/DataProvider";
 
-import Card from "../components/Card";
+import InboxRow from "../components/InboxRow";
 import Alert from "../components/Alert";
+
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 const Inbox = () => {
   const {
@@ -13,7 +15,7 @@ const Inbox = () => {
   } = useAuth();
   const {
     state: { goals },
-    dispatch: { fetchGoals },
+    dispatch: { fetchGoals, editGoal },
   } = useData();
 
   const [type, setType] = useState("WEEKLY");
@@ -47,15 +49,22 @@ const Inbox = () => {
       [[], [], []]
     );
 
+  const _editGoal = (goal) => {
+    goal = { ...goal, archived: true };
+    editGoal({ goal, token });
+  };
+
   return (
     <main className="flex-1 relative pb-8 z-0 overflow-y-auto">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="mt-8 mb-4 text-2xl font-medium text-gray-900">Inbox</h2>
         {inbox.length === 0 && <Alert content={alertContent} type="SUCCESS" />}
-        <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-2">
+          {/* <TransitionGroup> */}
           {inbox.map((goal, i) => (
-            <Card key={i} goal={goal} source="inbox" />
+            <InboxRow key={i} goal={goal} editGoal={_editGoal} />
           ))}
+          {/* </TransitionGroup> */}
         </div>
       </div>
     </main>
