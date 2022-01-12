@@ -31,9 +31,8 @@ const Inbox = () => {
     goals.reduce(
       (acc, curr) => {
         let i;
-        const created = moment
-          .utc(curr.createdAt)
-          .subtract(user.timezone_offset, "minutes");
+        const created = moment.utc(curr.createdAt);
+        // .subtract(user.timezone_offset, "minutes");
         const now = moment();
         if (curr.period === "DAILY" && !created.isSame(now, "day")) {
           i = 0;
