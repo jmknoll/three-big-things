@@ -5,13 +5,18 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const port = process.env.PORT || 8080;
+
 const passport = require("passport");
 const morgan = require("morgan");
-const path = require("path");
-const fs = require("fs");
+// const path = require("path");
+// const fs = require("fs");
+import path from "path";
+import fs from "fs";
+
+const port = process.env.PORT || 8080;
 
 const app = express();
+
 app.use(cors());
 app.use(passport.initialize());
 app.use(bodyParser.json());

@@ -1,9 +1,13 @@
-const db = require("../models");
-const Goal = db.Goal;
-const User = db.User;
-const moment = require("moment");
+import { Request, Response, NextFunction } from "express";
+import { PrismaClient } from "@prisma/client";
+import moment from "moment";
+// const db = require("../models");
+// const Goal = db.Goal;
+// const User = db.User;
 
-async function create(req, res) {
+const prisma = new PrismaClient();
+
+async function create(req: Request, res: Response) {
   if (!req.body.content) {
     res.status(400).send({
       message: "Content can not be empty!",
@@ -12,24 +16,34 @@ async function create(req, res) {
   }
 
   try {
-    const [record, created] = await Goal.upsert(
-      {
+    const updateFields = {
+      name: req.body.name,
+      content: req.body.content,
+      period: req.body.period,
+      status: req.body.status,
+    };
+
+    const goal = await prisma.goal.upsert({
+      where: {
         id: req.body.id,
-        user_id: req.user_id,
-        name: req.body.name,
-        content: req.body.content,
-        period: req.body.period,
-        status: req.body.status,
       },
-      { returning: true }
-    );
-    res.status(200).send(record);
-  } catch (e) {
+      update: {
+        ...updateFields,
+      },
+      create: {
+        id: req.body.id,
+        user_id: req.body.user_id,
+        ...updateFields,
+      },
+    });
+
+    res.status(200).send(goal);
+  } catch (e: any) {
     res.status(500).send({ error: e.message || "Error creating goal." });
   }
 }
 
-async function update(req, res) {
+async function update(req: Request, res: Response) {
   const { id } = req.params;
   if (!req.body.content) {
     res.status(400).send({
@@ -55,8 +69,6 @@ async function update(req, res) {
         raw: true,
       }
     );
-    console.log("record", status);
-    console.log("creawted", created);
     res.status(200).send(created);
   } catch (e) {
     res.status(500).send({ error: e.message || "Error creating goal." });
@@ -77,7 +89,11 @@ function shouldArchive(record, timezone_offset) {
   return -1;
 }
 
-async function updateGoalStatus(req, res, next) {
+async function updateGoalStatus(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   next();
   // this is for automatic archiving - might come back later
   // const archived = JSON.parse(req.query.archived);
@@ -105,7 +121,7 @@ async function updateGoalStatus(req, res, next) {
   // next();
 }
 
-function findAll(req, res) {
+function findAll(req: Request, res: Response) {
   const archived = JSON.parse(req.query.archived);
   Goal.findAll({
     where: {
@@ -115,12 +131,12 @@ function findAll(req, res) {
     order: [["updatedAt", "DESC"]],
   })
     .then((data) => res.status(201).send(data))
-    .catch((e) => {
+    .catch((e: any) => {
       res.status(500).send({ error: e.message });
     });
 }
 
-function destroy(req, res) {
+function destroy(req: Request, res: Response) {
   Goal.destroy({
     where: {
       id: req.params.id,
@@ -129,7 +145,7 @@ function destroy(req, res) {
     .then((data) => {
       res.status(200).send({ id: req.params.id });
     })
-    .catch((e) => {
+    .catch((e: any) => {
       res.status(500).send({ error: e.message });
     });
 }

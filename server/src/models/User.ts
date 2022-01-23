@@ -1,7 +1,7 @@
-const bcrypt = require("bcrypt");
-const uuidv1 = require("uuid/v1");
+import bcrypt from "bcrypt";
+import { v1 as uuidv1 } from "uuid";
 
-module.exports = (sequelize, Sequelize) => {
+module.exports = (sequelize: any, Sequelize: any) => {
   const User = sequelize.define(
     "User",
     {
@@ -65,7 +65,7 @@ module.exports = (sequelize, Sequelize) => {
   //   user.refresh_token = uuidv1();
   // });
 
-  User.prototype.comparePassword = function (somePassword) {
+  User.prototype.comparePassword = function (somePassword: string) {
     return bcrypt.compareSync(somePassword, this.password);
   };
 
