@@ -1,39 +1,24 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface Query {
-  archived: string | undefined;
-}
-
 async function create(req: Request, res: Response) {
-  if (!req.body.content) {
+  if (!req.body.name) {
     res.status(400).send({
-      message: "Content can not be empty!",
+      message: "Goal cannot be empty!",
     });
     return;
   }
 
   try {
-    const updateFields = {
-      name: req.body.name,
-      content: req.body.content,
-      period: req.body.period,
-      status: req.body.status,
-    };
-
-    const goal = await prisma.goal.upsert({
-      where: {
-        id: req.body.id,
-      },
-      update: {
-        ...updateFields,
-      },
-      create: {
-        id: req.body.id,
+    const goal = await prisma.goal.create({
+      data: {
+        name: req.body.name,
+        content: req.body.content,
+        period: req.body.period,
+        status: req.body.status,
         user_id: req.body.user_id,
-        ...updateFields,
       },
     });
 
@@ -44,7 +29,6 @@ async function create(req: Request, res: Response) {
 }
 
 async function update(req: Request, res: Response) {
-  const { id } = req.params;
   if (!req.body.content) {
     res.status(400).send({
       message: "Content can not be empty!",
@@ -73,36 +57,41 @@ async function update(req: Request, res: Response) {
 
 async function findAll(req: Request, res: Response) {
   try {
-    const archived: string = JSON.parse(req.query.archived as string);
+    const archivedStr: string = req.query.archived as string;
+    const archived: boolean = archivedStr === "true" ? true : false;
 
     const goals = await prisma.goal.findMany({
       where: {
         user_id: req.body.user_id,
+        archived: archived,
       },
       orderBy: {
-        created_at: "desc",
+        created_at: "asc",
       },
     });
+
     res.status(200).send(goals);
   } catch (e: any) {
+    console.log(e);
     res
       .status(500)
       .send({ error: e.message || "Error fetching goals for user." });
   }
 }
 
-function destroy(req: Request, res: Response) {
-  Goal.destroy({
-    where: {
-      id: req.params.id,
-    },
-  })
-    .then((data) => {
-      res.status(200).send({ id: req.params.id });
-    })
-    .catch((e: any) => {
-      res.status(500).send({ error: e.message });
+async function destroy(req: Request, res: Response) {
+  try {
+    const _id = req.params.id as string;
+    const id = parseInt(_id);
+    const goal = await prisma.goal.delete({
+      where: {
+        id,
+      },
     });
+    res.status(200).send({ id: goal.id });
+  } catch (e: any) {
+    res.status(500).send({ error: e.message || "Error destroying goal." });
+  }
 }
 
 module.exports = {

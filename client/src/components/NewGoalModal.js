@@ -47,30 +47,28 @@ export const NewGoalModal = (props) => {
     });
   };
 
-  const _createGoal = (e) => {
+  const _handleSubmit = (e) => {
     e && e.preventDefault();
+    if (props.mode === "EDIT") {
+      _editGoal();
+    } else {
+      _createGoal();
+    }
+    setShowGoalModal(false);
+    setGoal(defaultGoal);
+  };
+
+  const _createGoal = () => {
     if (!goal.name || goal.name === "") {
       setTitleError("Goal name is required");
       return;
     }
     createGoal({ token, goal });
-    setShowGoalModal(false);
-    setGoal(defaultGoal);
   };
 
-  const _archiveGoal = (e) => {
-    e.preventDefault();
+  const _editGoal = () => {
     setError("");
-    if (goal.status === "IN_PROGRESS") {
-      setError(
-        "Please set status to Complete or Incomplete in order to archive"
-      );
-      return;
-    }
-    goal.archived = true;
     editGoal({ token, goal });
-    setShowGoalModal(false);
-    setGoal(defaultGoal);
   };
 
   const _handleClose = () => {
@@ -121,7 +119,7 @@ export const NewGoalModal = (props) => {
             <form
               id="createGoalForm"
               onSubmit={(e) => {
-                _createGoal(e);
+                _handleSubmit(e);
               }}
               className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-7 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
             >
@@ -169,7 +167,7 @@ export const NewGoalModal = (props) => {
                       }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && e.metaKey) {
-                          _createGoal();
+                          _handleSubmit();
                         }
                       }}
                     />
@@ -203,19 +201,19 @@ export const NewGoalModal = (props) => {
               </div>
               {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
               <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                {props.source === "inbox" ? (
+                {props.mode === "EDIT" ? (
                   <button
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
-                    onClick={(e) => _archiveGoal(e)}
+                    onClick={(e) => _handleSubmit(e)}
                   >
-                    Archive
+                    Edit
                   </button>
                 ) : (
                   <button
                     type="button"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
-                    onClick={(e) => _createGoal(e)}
+                    onClick={(e) => _handleSubmit(e)}
                   >
                     Create
                   </button>

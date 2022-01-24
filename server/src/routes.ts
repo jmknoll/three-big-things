@@ -59,12 +59,7 @@ module.exports = (app: any) => {
     authCtrl.returnJWT
   );
 
-  router.get(
-    "/goals",
-    verifyToken,
-    goalCtrl.updateGoalStatus,
-    goalCtrl.findAll
-  );
+  router.get("/goals", verifyToken, goalCtrl.findAll);
   router.post("/goals", verifyToken, goalCtrl.create);
   router.put("/goals/:id", verifyToken, goalCtrl.update);
   router.delete("/goals/:id", verifyToken, goalCtrl.destroy);

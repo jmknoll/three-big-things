@@ -1,52 +1,48 @@
-const db = require("../models");
-const User = db.User;
-const moment = require("moment");
+import { Request, Response, NextFunction } from "express";
+import moment from "moment";
+import { PrismaClient } from "@prisma/client";
 
-async function me(req, res, next) {
+const prisma = new PrismaClient();
+
+async function me(req: Request, res: Response, next: NextFunction) {
   try {
-    const user = await User.findOne({
+    const user = await prisma.user.findUnique({
       where: {
-        id: req.user_id,
+        id: req.body.user_id,
       },
-      attributes: [
-        "id",
-        "name",
-        "email",
-        "refresh_token",
-        "last_login",
-        "timezone_offset",
-        "streak",
-      ],
     });
-    req.dbUser = user;
+    req.body.dbUser = user;
     next();
-  } catch (e) {
+  } catch (e: any) {
     res.status(500).send({ error: e.message || "Error fetching user" });
   }
 }
 
-async function updateAccountDetails(req, res, next) {
+async function updateAccountDetails(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
     // update timezone if it has changed
-    let { tzOffset } = req.query;
+    let tzOffset: any = req.query.tzOffset;
     tzOffset = parseInt(tzOffset);
-    if (tzOffset !== req.dbUser.timezone_offset) {
-      let res = await User.update(
-        { timezone_offset: tzOffset },
-        {
-          where: { id: req.dbUser.id },
-          returning: true,
-          limit: 1,
-          plain: true,
-        }
-      );
-      req.dbUser = res[1];
+    if (tzOffset !== req.body.dbUser.timezone_offset) {
+      let user = await prisma.user.update({
+        where: { id: req.body.dbUser.id },
+        data: {
+          timezone_offset: tzOffset,
+        },
+      });
+
+      req.body.dbUser = user;
     }
+
     // update user streak if neccesary
-    let last_login = moment.utc(req.dbUser.last_login);
-    let timezone_offset = req.dbUser.timezone_offset;
-    local_last_login = last_login.subtract(timezone_offset, "minutes");
-    local_now = moment().subtract(timezone_offset, "minutes");
+    let last_login = moment.utc(req.body.dbUser.last_login);
+    let timezone_offset = req.body.dbUser.timezone_offset;
+    let local_last_login = last_login.subtract(timezone_offset, "minutes");
+    let local_now = moment().subtract(timezone_offset, "minutes");
 
     const last_day = local_last_login.dayOfYear();
     const now_day = local_now.dayOfYear();
@@ -55,31 +51,20 @@ async function updateAccountDetails(req, res, next) {
     if (diff !== 0) {
       let newStreak = 0;
       if (diff === 1 || (now_day === 1 && diff === -364)) {
-        newStreak = req.dbUser.streak + 1;
+        newStreak = req.body.dbUser.streak + 1;
       } else {
         newStreak = 1;
       }
-
-      let res = await User.update(
-        { streak: newStreak, last_login: Date.now() },
-        {
-          where: { id: req.dbUser.id },
-          returning: true,
-          limit: 1,
-          plain: true,
-        }
-      );
-      req.dbUser = res[1];
     }
 
     next();
-  } catch (err) {
+  } catch (err: any) {
     console.log(err.message);
     res.status(500).send({ error: err.message || "Error fetching user" });
   }
 }
 
-function create(req, res) {
+async function create(req: Request, res: Response) {
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!",
@@ -87,16 +72,18 @@ function create(req, res) {
     return;
   }
 
-  User.create({
-    email: req.body.email,
-    password: req.body.password,
-  })
-    .then((user) => {
-      res.status(201).send(user);
-    })
-    .catch((e) => {
-      res.status(500).send({ error: e.message || "Error creating user" });
+  try {
+    const user = await prisma.user.create({
+      data: {
+        email: req.body.email,
+        password: req.body.password,
+      },
     });
+
+    res.status(200).send(user);
+  } catch (e: any) {
+    res.status(500).send({ error: e.message || "Error creating user" });
+  }
 }
 
 module.exports = {

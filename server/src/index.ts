@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express";
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
@@ -8,10 +9,10 @@ const bodyParser = require("body-parser");
 
 const passport = require("passport");
 const morgan = require("morgan");
-// const path = require("path");
-// const fs = require("fs");
-import path from "path";
-import fs from "fs";
+const path = require("path");
+const fs = require("fs");
+// import path from "path";
+// import fs from "fs";
 
 const port = process.env.PORT || 8080;
 

@@ -1,10 +1,13 @@
+import { Request, Response, NextFunction } from "express";
+import { PrismaClient, User } from "@prisma/client";
+import bcrypt from "bcrypt";
+
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 
-const db = require("../models");
-const User = db.User;
+const prisma = new PrismaClient();
 
-async function oauth(req, res, next) {
+async function oauth(req: Request, res: Response, next: NextFunction) {
   try {
     const client = new OAuth2Client(process.env.GAPI_CLIENT_ID);
     const { token, tzOffset } = req.body;
@@ -12,86 +15,87 @@ async function oauth(req, res, next) {
       idToken: token,
       audience: process.env.GAPI_CLIENT_ID,
     });
-    const { name, email } = ticket.getPayload();
 
-    const user = await User.findOrCreate({
-      where: {
-        email,
-      },
-      defaults: {
-        email,
-        name,
+    const { _name, email } = ticket.getPayload();
+
+    const user = await prisma.user.upsert({
+      where: { email: email },
+      update: {},
+      create: {
+        email: email,
         timezone_offset: tzOffset,
       },
-      attributes: [
-        "id",
-        "name",
-        "email",
-        "refresh_token",
-        "timezone_offset",
-        "streak",
-        "last_login",
-      ],
     });
 
-    req.dbUser = user[0];
+    req.body.dbUser = user;
 
     next();
-  } catch (e) {
-    console.log("error", e);
+  } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
 }
 
-function authenticate(req, res, next) {
-  User.findOne({
-    where: {
-      email: req.body.email,
-    },
-  })
-    .then((user) => {
-      if (user && user.comparePassword(req.body.password)) {
-        req.dbUser = user;
-        next();
-      } else {
-        res.status(401).json({ error: "Incorrect username or password" });
-      }
-    })
-    .catch((e) => {
-      res.status(500).json({ error: e.message });
-    });
+function comparePassword(user: User, password: string): boolean {
+  if (!user.password) {
+    return false;
+  }
+  return bcrypt.compareSync(user.password, password);
 }
 
-async function generateJWT(req, res, next) {
-  if (req.dbUser) {
-    const jwtPayload = { id: req.dbUser.id };
+async function authenticate(req: Request, res: Response, next: NextFunction) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email: req.body.id },
+    });
+
+    if (!user) {
+      res.status(401).json({ error: "Incorrect username or password" });
+      return;
+    }
+
+    if (comparePassword(user, req.body.password)) {
+      req.body.dbUser = user;
+      next();
+    } else {
+      res.status(401).json({ error: "Incorrect username or password" });
+    }
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+}
+
+async function generateJWT(req: Request, res: Response, next: NextFunction) {
+  if (req.body.dbUser) {
+    const jwtPayload = { id: req.body.dbUser.id };
     const jwtSecret = process.env.JWT_SECRET_KEY;
-    req.token = jwt.sign(jwtPayload, jwtSecret, {
-      expiresIn: parseInt(process.env.JWT_EXP_TIME),
+    req.body.token = jwt.sign(jwtPayload, jwtSecret, {
+      // If JWT_EXP_TIME is null, you have bigger problems
+      expiresIn: parseInt(process.env.JWT_EXP_TIME!),
     });
   }
   next();
 }
 
-function refreshJWT(req, res, next) {
-  User.findOne({
-    where: {
-      username: req.body.username,
-      refresh_token: req.body.refresh_token,
-    },
-  })
-    .then((user) => {
-      req.dbUser = user;
-      next();
-    })
-    .catch(() => {
-      res.status(401).json({ error: "Invalid username or token" });
-    });
-}
+// function refreshJWT(req: Request, res: Response, next: NextFunction) {
 
-function returnJWT(req, res) {
-  if (req.dbUser && req.token) {
-    res.status(201).json({ token: req.token, user: req.dbUser });
+//   User.findOne({
+//     where: {
+//       username: req.body.username,
+//       refresh_token: req.body.refresh_token,
+//     },
+//   })
+//     .then((user) => {
+//       req.dbUser = user;
+//       next();
+//     })
+//     .catch(() => {
+//       res.status(401).json({ error: "Invalid username or token" });
+//     });
+// }
+
+function returnJWT(req: Request, res: Response) {
+  if (req.body.dbUser && req.body.token) {
+    res.status(201).json({ token: req.body.token, user: req.body.dbUser });
   } else {
     res.status(401).json({ error: "Unauthorized" });
   }
@@ -101,6 +105,6 @@ module.exports = {
   oauth,
   authenticate,
   generateJWT,
-  refreshJWT,
+  // refreshJWT,
   returnJWT,
 };
