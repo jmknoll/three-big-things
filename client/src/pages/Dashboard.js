@@ -32,7 +32,7 @@ const Dashboard = () => {
     goals.reduce(
       (acc, curr) => {
         let i;
-        const created = moment.utc(curr.createdAt);
+        const created = moment.utc(curr.created_at);
         const now = moment();
         if (curr.period === "DAILY" && !created.isSame(now, "day")) {
           i = 0;

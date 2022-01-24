@@ -78,7 +78,7 @@ const History = (props) => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {moment
-                            .utc(goal.createdAt)
+                            .utc(goal.created_at)
                             .subtract(user.timezone_offset, "minutes")
                             .format("MM/DD/YYYY")}
                         </td>
