@@ -21,7 +21,7 @@ Backend: https://github.com/jmknoll/three-big-things/tree/master/server
 
 - Rework frontend authentication
 - Build landing page
-- Support markdown in cards
+
 - Build history / related cards on detail page
 - Write deploy script
 - Figure out logging solution

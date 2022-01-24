@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SequelizeMeta {
+  name String @id @db.VarChar(255)
+}
+
+model Goal {
+  id         Int      @id @default(autoincrement())
+  content    String?
+  period     String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt @db.Timestamptz(6)
+  user_id    String   @db.Uuid
+  name       String   @db.VarChar(255)
+  status     String   @db.VarChar(255)
+  archived   Boolean  @default(false)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@map("goals")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  name            String?   @db.VarChar(255)
+  email           String    @unique @db.VarChar(255)
+  password        String?   @db.VarChar(255)
+  refresh_token   String?   @default(dbgenerated("'ef334fb0-4da6-11ec-8a12-3db99b65be39'::uuid")) @db.Uuid
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @updatedAt @db.Timestamptz(6)
+  last_login      DateTime? @db.Timestamptz(6)
+  streak          Int?
+  timezone_offset Int?
+  goals           Goal[]
+
+  @@index([id, email])
+  @@map("users")
+}

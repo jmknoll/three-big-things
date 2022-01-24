@@ -1,4 +1,6 @@
-module.exports = (app) => {
+import { Request, Response, NextFunction } from "express";
+
+module.exports = (app: any) => {
   const userCtrl = require("./controllers/UserController");
   const authCtrl = require("./controllers/AuthController");
   const goalCtrl = require("./controllers/GoalController");
@@ -6,25 +8,29 @@ module.exports = (app) => {
 
   var router = require("express").Router();
 
-  function verifyToken(req, res, next) {
+  function verifyToken(req: Request, res: Response, next: NextFunction) {
     let token = req.headers["x-access-token"];
 
     if (!token) {
       return res.status(401).send({ message: "No token provided!" });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-      if (err) {
-        return res.status(401).send({
-          message: "Unauthorized!",
-        });
+    jwt.verify(
+      token,
+      process.env.JWT_SECRET_KEY,
+      (err: unknown, decoded: { id: string }) => {
+        if (err) {
+          return res.status(401).send({
+            message: "Unauthorized!",
+          });
+        }
+        req.body.user_id = decoded.id;
+        next();
       }
-      req.user_id = decoded.id;
-      next();
-    });
+    );
   }
 
-  router.get("/", (req, res) => {
+  router.get("/", (req: Request, res: Response) => {
     res.json({ message: "Welcome to Goalbook." });
   });
 
@@ -53,12 +59,7 @@ module.exports = (app) => {
     authCtrl.returnJWT
   );
 
-  router.get(
-    "/goals",
-    verifyToken,
-    goalCtrl.updateGoalStatus,
-    goalCtrl.findAll
-  );
+  router.get("/goals", verifyToken, goalCtrl.findAll);
   router.post("/goals", verifyToken, goalCtrl.create);
   router.put("/goals/:id", verifyToken, goalCtrl.update);
   router.delete("/goals/:id", verifyToken, goalCtrl.destroy);

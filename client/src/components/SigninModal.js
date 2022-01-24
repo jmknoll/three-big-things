@@ -7,13 +7,12 @@ import { GoogleLogo } from "../assets/icons";
 
 const SigninModal = (props) => {
   const { showModal: open, setShowModal: setOpen } = props;
-  const { state, dispatch } = useAuth(null);
+  const { dispatch } = useAuth(null);
 
   const handleLogin = async (googleData) => {
-    const { result, error } = await dataService.oauth({
+    const { result } = await dataService.oauth({
       token: googleData.tokenId,
     });
-    console.log("res", result, "err", error);
     if (result) {
       dispatch({
         type: "LOGIN",
