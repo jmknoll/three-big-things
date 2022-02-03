@@ -7,7 +7,8 @@
     "start": "node .",
     "build": "tsc -p .",
     "compile": "tsc && node dist/index.js",
-    "dev": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"npm run compile\"",
+    "start:dev": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"npm run compile\"",
+    "start:prod": "nodemon dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
@@ -20,7 +21,6 @@
     "@types/bcrypt": "^5.0.0",
     "@types/validator": "^13.7.1",
     "babel-cli": "^6.26.0",
-    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

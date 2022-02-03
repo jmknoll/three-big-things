@@ -45,12 +45,12 @@ module.exports = (app: any) => {
 
   router.post("/users", userCtrl.create);
 
-  router.post(
-    "/auth",
-    authCtrl.authenticate,
-    authCtrl.generateJWT,
-    authCtrl.returnJWT
-  );
+  // router.post(
+  //   "/auth",
+  //   authCtrl.authenticate,
+  //   authCtrl.generateJWT,
+  //   authCtrl.returnJWT
+  // );
 
   router.post(
     "/oauth",

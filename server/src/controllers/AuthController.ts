@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient, User } from "@prisma/client";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
@@ -35,34 +35,34 @@ async function oauth(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-function comparePassword(user: User, password: string): boolean {
-  if (!user.password) {
-    return false;
-  }
-  return bcrypt.compareSync(user.password, password);
-}
+// function comparePassword(user: User, password: string): boolean {
+//   if (!user.password) {
+//     return false;
+//   }
+//   return bcrypt.compareSync(user.password, password);
+// }
 
-async function authenticate(req: Request, res: Response, next: NextFunction) {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email: req.body.id },
-    });
+// async function authenticate(req: Request, res: Response, next: NextFunction) {
+//   try {
+//     const user = await prisma.user.findUnique({
+//       where: { email: req.body.id },
+//     });
 
-    if (!user) {
-      res.status(401).json({ error: "Incorrect username or password" });
-      return;
-    }
+//     if (!user) {
+//       res.status(401).json({ error: "Incorrect username or password" });
+//       return;
+//     }
 
-    if (comparePassword(user, req.body.password)) {
-      req.body.dbUser = user;
-      next();
-    } else {
-      res.status(401).json({ error: "Incorrect username or password" });
-    }
-  } catch (e: any) {
-    res.status(500).json({ error: e.message });
-  }
-}
+//     if (comparePassword(user, req.body.password)) {
+//       req.body.dbUser = user;
+//       next();
+//     } else {
+//       res.status(401).json({ error: "Incorrect username or password" });
+//     }
+//   } catch (e: any) {
+//     res.status(500).json({ error: e.message });
+//   }
+// }
 
 async function generateJWT(req: Request, res: Response, next: NextFunction) {
   if (req.body.dbUser) {
@@ -103,7 +103,7 @@ function returnJWT(req: Request, res: Response) {
 
 module.exports = {
   oauth,
-  authenticate,
+  // authenticate,
   generateJWT,
   // refreshJWT,
   returnJWT,

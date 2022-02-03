@@ -60,7 +60,7 @@ const Dashboard = () => {
                 <div className="flex items-center">
                   <Placeholder size="16" />
                   <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
-                    What are you working on, {user.name.split(" ")[0]}?
+                    What are you working on, {user.name?.split(" ")[0]}?
                   </h1>
                 </div>
                 <div className="bg-cyan-700 rounded-full text-white h-12 w-12 inline-flex items-center justify-center text-2xl">
