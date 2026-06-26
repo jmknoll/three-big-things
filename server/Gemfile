@@ -1,0 +1,10 @@
+source "https://rubygems.org"
+ruby ">= 3.4.0"
+
+gem "rails", "~> 8.0"
+gem "pg"
+gem "puma", "~> 6.0"
+gem "rack-cors"
+gem "jwt"
+gem "googleauth"
+gem "bcrypt"

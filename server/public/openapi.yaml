@@ -1,0 +1,1020 @@
+openapi: 3.0.3
+info:
+  title: Evensong API
+  version: "1.0"
+  description: |
+    Rails API backing the Evensong iOS app and the legacy React frontend.
+
+    All `/v1` endpoints require an `x-access-token` JWT header unless marked **public**.
+    Obtain a token via `POST /v1/oauth`.
+
+    **Error shape:** `{ "error": "human-readable message" }`
+
+servers:
+  - url: http://localhost:8080
+    description: Local Docker
+
+components:
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: x-access-token
+      description: JWT obtained from POST /v1/oauth or GET /v1/me
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          nullable: true
+        timezone_offset:
+          type: integer
+          nullable: true
+          description: Minutes offset from UTC
+        meta_streak_current:
+          type: integer
+        meta_streak_longest:
+          type: integer
+        streak_last_calc_date:
+          type: string
+          format: date
+          nullable: true
+        morning_reminder_time:
+          type: string
+          example: "08:00"
+        eod_reminder_time:
+          type: string
+          example: "20:00"
+        notifications_enabled:
+          type: boolean
+        onboarding_done:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ActivityEntry:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        goals_set:
+          type: integer
+        goals_completed:
+          type: integer
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 48
+        color:
+          type: string
+          enum: [clay, rose, fern, gold, dusk, teal, slate, mauve]
+        description:
+          type: string
+          nullable: true
+          maxLength: 200
+        target_quarter:
+          type: string
+          nullable: true
+          example: "Q2 2026"
+        status:
+          type: string
+          enum: [active, archived]
+        sort_order:
+          type: integer
+        archived_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        milestone_count:
+          type: integer
+        activity:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityEntry'
+
+    Milestone:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 72
+        description:
+          type: string
+          nullable: true
+          maxLength: 200
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        target_date:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          enum: [active, complete, skipped]
+        sort_order:
+          type: integer
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ProjectRef:
+      type: object
+      description: Condensed project summary embedded in goal responses
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        color:
+          type: string
+
+    MilestoneRef:
+      type: object
+      description: Condensed milestone summary embedded in goal responses
+      nullable: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+
+    Goal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        milestone_id:
+          type: string
+          format: uuid
+          nullable: true
+        carry_forward_of:
+          type: string
+          format: uuid
+          nullable: true
+        text:
+          type: string
+          maxLength: 120
+        date:
+          type: string
+          format: date
+        slot:
+          type: integer
+          enum: [1, 2, 3]
+        status:
+          type: string
+          enum: [pending, complete, partial, carried_forward, expired]
+        carried_forward:
+          type: boolean
+        note_text:
+          type: string
+          nullable: true
+          maxLength: 280
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        project:
+          $ref: '#/components/schemas/ProjectRef'
+        milestone:
+          $ref: '#/components/schemas/MilestoneRef'
+
+    ProjectDetail:
+      allOf:
+        - $ref: '#/components/schemas/Project'
+        - type: object
+          properties:
+            milestones:
+              type: array
+              items:
+                $ref: '#/components/schemas/Milestone'
+            recent_goals:
+              type: array
+              items:
+                $ref: '#/components/schemas/Goal'
+              description: Goals from the last 7 days, ordered date desc + slot asc
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+paths:
+
+  # ─── Auth ──────────────────────────────────────────────────────────────────
+
+  /v1/oauth:
+    post:
+      tags: [Auth]
+      summary: Google Sign-In (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  description: Google ID token
+                tzOffset:
+                  type: integer
+                  description: Client timezone offset in minutes from UTC
+            example:
+              token: "<google_id_token>"
+              tzOffset: -300
+      responses:
+        "201":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT for subsequent requests
+                  user:
+                    $ref: '#/components/schemas/User'
+        "500":
+          description: Google token verification failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/me:
+    get:
+      tags: [Auth]
+      summary: Refresh token and fetch user (recalculates streak)
+      security:
+        - tokenAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Freshly issued JWT
+                  user:
+                    $ref: '#/components/schemas/User'
+        "401":
+          description: Missing or invalid JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags: [Auth]
+      summary: Update user settings
+      security:
+        - tokenAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timezone_offset:
+                  type: integer
+                morning_reminder_time:
+                  type: string
+                  example: "07:30"
+                eod_reminder_time:
+                  type: string
+                  example: "21:00"
+                notifications_enabled:
+                  type: boolean
+                onboarding_done:
+                  type: boolean
+      responses:
+        "200":
+          description: Updated user (no token refresh)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── Projects ──────────────────────────────────────────────────────────────
+
+  /v1/projects:
+    get:
+      tags: [Projects]
+      summary: List projects with activity (last 30 days)
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [active, archived]
+            default: active
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Projects]
+      summary: Create a project
+      security:
+        - tokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, color]
+              properties:
+                name:
+                  type: string
+                  maxLength: 48
+                color:
+                  type: string
+                  enum: [clay, rose, fern, gold, dusk, teal, slate, mauve]
+                description:
+                  type: string
+                  maxLength: 200
+                target_quarter:
+                  type: string
+                  example: "Q2 2026"
+            example:
+              name: "Build the iOS app"
+              color: "fern"
+              description: "Ship Evensong v1"
+              target_quarter: "Q1 2026"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/projects/reorder:
+    post:
+      tags: [Projects]
+      summary: Reorder projects
+      security:
+        - tokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [order]
+              properties:
+                order:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: All project IDs in desired display order
+            example:
+              order: ["uuid-1", "uuid-3", "uuid-2"]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+        "422":
+          description: One or more IDs don't belong to the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/projects/{id}:
+    get:
+      tags: [Projects]
+      summary: Project detail with milestones and recent goals
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDetail'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags: [Projects]
+      summary: Update project
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                color:
+                  type: string
+                  enum: [clay, rose, fern, gold, dusk, teal, slate, mauve]
+                description:
+                  type: string
+                  nullable: true
+                target_quarter:
+                  type: string
+                  nullable: true
+      responses:
+        "200":
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/projects/{id}/archive:
+    post:
+      tags: [Projects]
+      summary: Archive a project
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Archived project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: Already archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/projects/{id}/unarchive:
+    post:
+      tags: [Projects]
+      summary: Unarchive a project
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Active project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── Milestones ────────────────────────────────────────────────────────────
+
+  /v1/projects/{project_id}/milestones:
+    get:
+      tags: [Milestones]
+      summary: List milestones for a project
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: project_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Milestone'
+        "404":
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Milestones]
+      summary: Create a milestone
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: project_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  maxLength: 72
+                description:
+                  type: string
+                  maxLength: 200
+                start_date:
+                  type: string
+                  format: date
+                target_date:
+                  type: string
+                  format: date
+            example:
+              name: "Core data model"
+              description: "Design and migrate schema"
+              start_date: "2026-03-01"
+              target_date: "2026-03-14"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Milestone'
+        "404":
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/projects/{project_id}/milestones/{id}:
+    put:
+      tags: [Milestones]
+      summary: Update a milestone
+      description: Setting `status=complete` sets `completed_at=now`. Setting it back to `active` clears `completed_at`.
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: project_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                  nullable: true
+                start_date:
+                  type: string
+                  format: date
+                  nullable: true
+                target_date:
+                  type: string
+                  format: date
+                  nullable: true
+                status:
+                  type: string
+                  enum: [active, complete, skipped]
+      responses:
+        "200":
+          description: Updated milestone
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Milestone'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Milestones]
+      summary: Delete a milestone
+      description: Goals referencing this milestone have `milestone_id` set to null (they remain attached to the project).
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: project_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ─── Daily Goals ───────────────────────────────────────────────────────────
+
+  /v1/goals:
+    get:
+      tags: [Goals]
+      summary: Get goals for a date
+      description: Returns all goals for the requested date, ordered by slot. Includes nested project and milestone summaries.
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date
+          example: "2026-03-04"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Goal'
+        "400":
+          description: Missing date parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Goals]
+      summary: Create a goal (morning entry)
+      description: One call per slot. Returns 422 if `(user_id, date, slot)` is already taken.
+      security:
+        - tokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text, date, slot, project_id]
+              properties:
+                text:
+                  type: string
+                  maxLength: 120
+                date:
+                  type: string
+                  format: date
+                slot:
+                  type: integer
+                  enum: [1, 2, 3]
+                project_id:
+                  type: string
+                  format: uuid
+                milestone_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Must belong to the specified project
+            example:
+              text: "Wire up goal creation flow"
+              date: "2026-03-04"
+              slot: 1
+              project_id: "uuid"
+              milestone_id: "uuid"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        "422":
+          description: Slot taken or milestone validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/goals/{id}:
+    put:
+      tags: [Goals]
+      summary: Update goal text or assignment
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  maxLength: 120
+                project_id:
+                  type: string
+                  format: uuid
+                milestone_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+      responses:
+        "200":
+          description: Updated goal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/goals/{id}/checkin:
+    post:
+      tags: [Goals]
+      summary: Set final status (EOD check-in or stale resolution)
+      description: |
+        Used for both evening check-in and resolving prior-day pending goals.
+        Returns 422 if the goal's date is more than 7 days in the past.
+
+        Setting `status=carried_forward` does **not** create tomorrow's goal automatically
+        — use `POST /v1/goals/:id/carry_forward` for that.
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [complete, partial, carried_forward, expired]
+                note_text:
+                  type: string
+                  nullable: true
+                  maxLength: 280
+            example:
+              status: "complete"
+              note_text: "Got it done by 3pm."
+      responses:
+        "200":
+          description: Updated goal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: Goal date is too old or invalid status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/goals/{id}/carry_forward:
+    post:
+      tags: [Goals]
+      summary: Copy goal to tomorrow
+      description: |
+        Creates a new goal in the earliest available slot for the next calendar day,
+        pre-filled with original text, project, and milestone.
+
+        Sets `carry_forward_of` on the new goal and `carried_forward=true` on the original.
+
+        Returns 422 if:
+        - Original already has `carried_forward=true`
+        - All 3 slots for tomorrow are occupied
+      security:
+        - tokenAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: New goal for tomorrow
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: Already carried forward or tomorrow is full
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

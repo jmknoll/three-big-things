@@ -1,3 +1,22 @@
-node_modules
-# Keep environment variables out of version control
+# Environment
 .env
+
+# Logs
+log/
+
+# Temp files
+tmp/
+
+# Bundler
+.bundle/
+vendor/bundle/
+
+# Credentials / secrets
+config/credentials.yml.enc
+config/master.key
+
+# Database
+db/schema.rb
+
+# OS
+.DS_Store

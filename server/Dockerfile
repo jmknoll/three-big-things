@@ -1,12 +1,16 @@
-FROM node:16-alpine
+FROM ruby:3.4-alpine
+
+RUN apk add --no-cache build-base postgresql-dev tzdata libxml2-dev libxslt-dev yaml-dev
 
 WORKDIR /app
 
-COPY ["package.json", "yarn.lock", "./"]
+ENV BUNDLE_FORCE_RUBY_PLATFORM=1
 
-RUN npm install
+COPY Gemfile ./
+RUN bundle install
+
 COPY . .
+
 EXPOSE 8080
 
-RUN npx prisma generate
-CMD ["npm", "run", "start:dev"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "8080"]
