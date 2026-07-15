@@ -40,7 +40,7 @@ class ResendMailer
     req['Authorization'] = "Bearer #{api_key}"
     req['Content-Type']  = 'application/json'
     req.body = {
-      from: ENV.fetch('RESEND_FROM_EMAIL', 'Evensong <onboarding@resend.dev>'),
+      from: ENV.fetch('RESEND_FROM_EMAIL', 'Evensong <noreply@evensong.jamesonknoll.com>'),
       to: [to],
       subject: subject,
       html: html

@@ -62,6 +62,7 @@ module V1
 
       attrs = { status: status }
       attrs[:completed_at] = Time.now if %w[complete partial].include?(status)
+      attrs[:note_text] = params[:note_text] if params.key?(:note_text)
 
       goal.update!(attrs)
       render json: goal.goal_json

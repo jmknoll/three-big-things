@@ -15,10 +15,12 @@ three-big-things/
 
 ## Running the Project
 
-**Preferred: Docker Compose**
+**Preferred: Make**
 
 ```bash
-docker-compose up --build
+make          # starts everything (frontend + backend + postgres)
+make backend  # starts only the Rails API + postgres
+make frontend # starts only the React client
 # Frontend: http://localhost:3000
 # Backend:  http://localhost:8080
 # Postgres: localhost:5432
@@ -106,6 +108,11 @@ JWT_SECRET_KEY=...
 JWT_EXP_TIME=360000
 GAPI_CLIENT_ID=...
 RAILS_ENV=development
+
+# Transactional email via Resend (evensong.jamesonknoll.com is verified)
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=Evensong <noreply@evensong.jamesonknoll.com>
+APP_BASE_URL=http://localhost:8080
 ```
 
 **Client** (`client/.env.development`):

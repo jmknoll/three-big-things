@@ -55,6 +55,8 @@ components:
           example: "20:00"
         notifications_enabled:
           type: boolean
+        email_confirmed:
+          type: boolean
         onboarding_done:
           type: boolean
         created_at:
@@ -301,6 +303,150 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /v1/email_signup:
+    post:
+      tags: [Auth]
+      summary: Create account with email + password (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+                name:
+                  type: string
+                tzOffset:
+                  type: integer
+                  description: Client timezone offset in minutes from UTC
+            example:
+              email: "user@example.com"
+              password: "secret123"
+              name: "Jameson"
+              tzOffset: -300
+      responses:
+        "201":
+          description: Account created — confirmation email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        "422":
+          description: Email already taken or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/email_signin:
+    post:
+      tags: [Auth]
+      summary: Sign in with email + password (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+            example:
+              email: "user@example.com"
+              password: "secret123"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/forgot_password:
+    post:
+      tags: [Auth]
+      summary: Request a password reset email (public)
+      description: Always returns 200 — does not reveal whether the email address has an account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+            example:
+              email: "user@example.com"
+      responses:
+        "200":
+          description: Reset email sent (or silently skipped if email unknown)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /v1/resend_confirmation:
+    post:
+      tags: [Auth]
+      summary: Resend email confirmation link (public)
+      description: Always returns 200 — does not reveal whether the email address has an account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+            example:
+              email: "user@example.com"
+      responses:
+        "200":
+          description: Confirmation email sent (or silently skipped if already confirmed)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
   /v1/me:
     get:

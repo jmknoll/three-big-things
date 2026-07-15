@@ -21,6 +21,8 @@ struct OnboardingFlow: View {
     }
 
     private func completeOnboarding() async {
+        struct Patch: Encodable { let onboardingDone: Bool }
+        _ = try? await APIClient.shared.request(.patchMe, body: Patch(onboardingDone: true)) as User
         await auth.refreshUser()
     }
 }

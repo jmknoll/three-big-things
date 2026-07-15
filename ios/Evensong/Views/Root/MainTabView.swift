@@ -13,6 +13,7 @@ struct MainTabView: View {
                         Label("Today", systemImage: "sun.max")
                     }
                     .environmentObject(todayVM)
+                    .environmentObject(projectsVM)
 
                 ProjectListView()
                     .tabItem {
