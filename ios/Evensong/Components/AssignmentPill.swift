@@ -3,6 +3,7 @@ import SwiftUI
 struct AssignmentPill: View {
     @Binding var assignment: Assignment?
     @EnvironmentObject var projectsVM: ProjectsViewModel
+    @EnvironmentObject var router: AppRouter
     @State private var showSheet = false
 
     var body: some View {
@@ -41,6 +42,7 @@ struct AssignmentPill: View {
         .sheet(isPresented: $showSheet) {
             AssignmentSheet(selection: $assignment)
                 .environmentObject(projectsVM)
+                .environmentObject(router)
         }
         .accessibilityLabel(accessibilityLabel)
         .accessibilityHint("Tap to assign project")

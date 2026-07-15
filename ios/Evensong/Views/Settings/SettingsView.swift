@@ -3,12 +3,15 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var auth: AuthViewModel
     @EnvironmentObject var projectsVM: ProjectsViewModel
+    @EnvironmentObject var router: AppRouter
     @StateObject private var settingsVM = SettingsViewModel()
 
     @State private var morningTime: Date = defaultTime(hour: 8)
     @State private var eodTime: Date = defaultTime(hour: 20)
     @State private var showNotificationsExpanded = false
     @State private var showCreateProject = false
+    @State private var showSoftLimitSheet = false
+    @State private var continueToCreate = false
     @State private var editingProject: Project?
 
     var body: some View {
@@ -34,8 +37,11 @@ struct SettingsView: View {
                         }
                     }
                     Button {
-                        if projectsVM.activeProjects.count >= 3 { /* soft nudge via alert */ }
-                        showCreateProject = true
+                        if projectsVM.activeProjects.count >= 3 {
+                            showSoftLimitSheet = true
+                        } else {
+                            showCreateProject = true
+                        }
                     } label: {
                         Label("New project", systemImage: "plus")
                             .foregroundStyle(Color.indigo)
@@ -87,6 +93,20 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            // Soft-limit nudge (§5.3.1). "Review active projects" jumps to the
+            // Projects tab; creation is deferred to onDismiss to avoid sheet contention.
+            .sheet(isPresented: $showSoftLimitSheet, onDismiss: {
+                if continueToCreate {
+                    continueToCreate = false
+                    showCreateProject = true
+                }
+            }) {
+                SoftLimitSheet(
+                    count: projectsVM.activeProjects.count,
+                    onReview: { router.selectedTab = .projects },
+                    onContinue: { continueToCreate = true }
+                )
+            }
             .sheet(isPresented: $showCreateProject) {
                 ProjectEditSheet(project: nil)
                     .environmentObject(projectsVM)

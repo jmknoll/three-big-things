@@ -58,7 +58,9 @@ The central design philosophy is **calm intentionality**. The app should feel cl
 - ✅ Project detail view with milestone list
 - ✅ Archived projects (browsable, read-only)
 - ✅ Push notifications (morning + EOD)
-- ⬜ Soft nudge when exceeding 3 active projects — partial (nudge bar in Assignment Sheet exists; nudge sheet on new-project creation is a stub)
+- ✅ Email/password auth (iOS + backend), password reset, and email confirmation flows
+- ✅ Soft nudge when exceeding 3 active projects — Assignment Sheet nudge bar (4+) with a functional "Manage" link, plus the spec'd `SoftLimitSheet` ("Review active projects" / "Continue anyway") gating new-project creation from both the Projects and Settings tabs (3+).
+- ⬜ Re-enable Google Sign-In on iOS (still commented out; backend `POST /v1/oauth` endpoint exists but is unused)
 
 ### Out of Scope (v2+)
 
@@ -187,7 +189,7 @@ _Displayed when the app is opened and no goals have been set for today._
 > - Return key advances focus to the next slot's text field, not to the assignment pill. This keeps the writing flow uninterrupted.
 > - Assignment pill is always visible below the active slot's text. It reads "Assign to project →" in stone color when unset, and shows the project color dot + name when set.
 
-> **TODO:** Slot expand/compress animation on focus is not yet implemented — all three slots remain the same size regardless of which is active. Return key focus chaining between the three goal text fields is also missing.
+> **✅ DONE:** Slot expand/compress animation on focus is implemented — the focused slot breathes open and siblings compress via the `slotExpand` spring, gated on Reduce Motion. Return-key focus chaining advances 1 → 2 → 3 (implemented by intercepting the newline on the vertical-axis field, since `.onSubmit` does not fire for multiline fields). Focus is lifted to `MorningEntryView` via a shared `GoalField` focus binding.
 
 ---
 
@@ -217,7 +219,7 @@ _A bottom sheet, triggered from a goal slot's assignment pill._
 - Selected state: the chosen row shows the sage accent color and a checkmark. Sheet dismisses automatically after selection with a brief haptic.
 - If the user has 4+ active projects, a soft amber nudge bar appears at the top of the sheet: _"You have 4 active projects. Fewer tends to work better."_ with a "Manage" link.
 
-> **TODO:** The nudge bar appears but the "Manage" link is not implemented — it does not navigate to the project list.
+> **✅ DONE:** The nudge bar's "Manage" link is implemented — via a shared `AppRouter`, tapping it dismisses the sheet and switches to the Projects tab.
 
 ---
 
@@ -297,7 +299,7 @@ _Bottom sheet — approximately half height._
 >
 > Two options: **"Review active projects"** (opens project list) and **"Continue anyway"** (opens project creation form). No blocking. This is a gentle reminder, not a gate.
 
-> **TODO:** The soft limit confirmation sheet is not yet implemented. The condition (3+ active projects) is detected in `SettingsView` but the sheet does not appear — currently a stub comment.
+> **✅ DONE:** The custom `SoftLimitSheet` is implemented per this spec — presented before the creation form at 3+ active projects with the two options **"Review active projects"** and **"Continue anyway"**, and no blocking. It is wired from **both** the Projects tab (`+` button) and the Settings tab ("New project"). On Settings, "Review active projects" jumps to the Projects tab via `AppRouter`; "Continue anyway" opens the creation form (deferred to `onDismiss` to avoid sheet contention).
 
 ---
 
@@ -445,7 +447,9 @@ The app's voice is a calm, warm, and direct friend — not a life coach. It neve
 - Notification scheduling via `UNUserNotificationCenter`. Re-schedule on every settings change and every app foreground. Notification times are fetched from the API on launch and stored locally only for scheduling purposes.
 - **Auth:** Email/password sign-up and sign-in are implemented on both iOS and the Rails backend (this was added beyond the original Google-OAuth-only spec). Google Sign-In is scaffolded on the backend (`POST /v1/oauth`) but commented out on the iOS side pending re-enablement.
 
-> **TODO:** Re-enable Google Sign-In on iOS (`AuthViewModel` and `LoginView` have the implementation commented out). Add password reset and email confirmation flows — currently the signup endpoint creates an account and issues a JWT with no verification step.
+> **✅ DONE:** Password reset and email confirmation flows are now implemented end-to-end. Backend: `POST /v1/forgot_password`, web reset page (`GET`/`POST /reset_password`), `GET /confirm_email`, and `POST /v1/resend_confirmation`, with token generation/expiry on `User` and email delivery via `ResendMailer` (Resend HTTP API). iOS: "Forgot password?" → `ForgotPasswordSheet` and `AuthViewModel.forgotPassword`/`resendConfirmation`. Note: signup still issues a JWT immediately and the app does not gate on a confirmed email (confirmation is non-blocking).
+>
+> **TODO:** Re-enable Google Sign-In on iOS — `AuthViewModel.signInWithGoogle` and the "Continue with Google" button in the login view are still commented out. The backend `POST /v1/oauth` endpoint exists but nothing on iOS calls it.
 
 ---
 
@@ -479,7 +483,7 @@ The Today tab has three distinct states driven by time-of-day and data presence:
 3. **Notification permission request:** framed as "Intention works best with morning and evening reminders. Enable them?" with time selectors pre-set to defaults. Skip option available.
 4. **First morning entry:** land directly on the Morning Entry screen with a single-use tooltip pointing at the project assignment pill.
 
-> **TODO:** Step 1 (welcome screen) is not yet implemented. `OnboardingFlow` begins directly at step 2 (project creation). The auth/sign-in screen (`LoginView`) already shows the app name and purpose tagline, so this may be combined or reconsidered during polish.
+> **✅ DONE:** Step 1 (welcome screen) is implemented as `OnboardingWelcomeView` — the initial `OnboardingStep` now renders app name, a one-line purpose statement, and a "Get started" button before project creation. (Note: `WelcomeView.swift` still contains the pre-auth `LoginView`; the onboarding welcome is a separate view in `OnboardingFlow.swift`.)
 
 ---
 
@@ -514,3 +518,5 @@ v1 success is defined by habit formation, not growth. A user who opens the app e
 | ------- | --------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | 1.0     | March 2026 | Initial draft. Covers product vision, data model, all v1 screens, design language, motion, microcopy, and engineering guidance. |
 | 1.1     | June 2026 | Build status audit. Marked completed items in §2 scope list. Added TODO callouts in §5.1.1 (slot animation + focus chaining), §5.1.3 (Assignment Sheet "Manage" link), §5.3.1 (soft limit nudge sheet), §9.1 (Google Sign-In + email auth note), §9.4 (onboarding welcome screen). Status updated to In Development. |
+| 1.2     | July 2026 | Build status re-audit against iOS + Rails code. §9.1: marked password reset and email confirmation flows DONE (backend endpoints + web pages + Resend mailer + iOS UI); Google Sign-In remains the only auth TODO. §5.3.1 / §2: soft-limit creation nudge now partially done — a `.confirmationDialog` gates creation from the Projects tab (not the spec'd custom sheet; Settings-tab nudge still a stub). Confirmed still-open TODOs: §5.1.1 (slot animation + Return-key focus chaining), §5.1.3 (Assignment Sheet "Manage" link), §9.4 (onboarding welcome step — `WelcomeView.swift` actually contains `LoginView`; flow still starts at project creation). |
+| 1.3     | July 2026 | Implemented the four remaining v1.2 TODOs. §5.1.1: focus-driven slot expand/compress (`slotExpand` spring, Reduce-Motion aware) + Return-key focus chaining via newline interception, with focus lifted to `MorningEntryView` (`GoalField`). §5.1.3: functional "Manage" link via new `AppRouter` (tab selection). §5.3.1 / §2: spec'd `SoftLimitSheet` ("Review active projects" / "Continue anyway") wired from both Projects and Settings tabs, replacing the `.confirmationDialog`. §9.4: `OnboardingWelcomeView` added as onboarding step 1. New shared types (`AppRouter`, `SoftLimitSheet`, `OnboardingWelcomeView`) co-located in existing files (XcodeGen globs the source dir). Google Sign-In (§9.1) remains the only open item, deferred pending a real Google OAuth client ID. Code complete; awaiting a full `xcodebuild` compile + Simulator walkthrough for verification. |

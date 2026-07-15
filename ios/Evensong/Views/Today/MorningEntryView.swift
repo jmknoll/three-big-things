@@ -7,6 +7,7 @@ struct MorningEntryView: View {
 
     @State private var drafts: [GoalDraft] = [GoalDraft(), GoalDraft(), GoalDraft()]
     @State private var isSubmitting = false
+    @FocusState private var focusedField: GoalField?
 
     private var canSubmit: Bool {
         drafts.allSatisfy { !$0.text.trimmingCharacters(in: .whitespaces).isEmpty && $0.assignment != nil }
@@ -25,7 +26,7 @@ struct MorningEntryView: View {
 
                 VStack(spacing: Space.md) {
                     ForEach(0..<3, id: \.self) { i in
-                        GoalCard(mode: .entry(draft: $drafts[i], slot: i + 1))
+                        GoalCard(mode: .entry(draft: $drafts[i], slot: i + 1), focus: $focusedField)
                             .environmentObject(projectsVM)
                     }
                 }

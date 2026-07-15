@@ -20,3 +20,6 @@ db/schema.rb
 
 # OS
 .DS_Store
+
+# Corporate CA certs (machine/proxy-specific — see certs/README.md)
+certs/*.crt

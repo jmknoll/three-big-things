@@ -3,6 +3,7 @@ import SwiftUI
 struct AssignmentSheet: View {
     @Binding var selection: Assignment?
     @EnvironmentObject var projectsVM: ProjectsViewModel
+    @EnvironmentObject var router: AppRouter
     @Environment(\.dismiss) var dismiss
     @State private var expandedProjectId: String?
 
@@ -11,9 +12,18 @@ struct AssignmentSheet: View {
             List {
                 if projectsVM.activeProjects.count >= 4 {
                     Section {
-                        Label("You have \(projectsVM.activeProjects.count) active projects. Consider archiving completed ones.", systemImage: "info.circle")
-                            .font(.footnote)
+                        HStack(spacing: Space.sm) {
+                            Label("You have \(projectsVM.activeProjects.count) active projects. Fewer tends to work better.", systemImage: "info.circle")
+                                .font(.footnote)
+                                .foregroundStyle(Color.amber)
+                            Spacer(minLength: Space.sm)
+                            Button("Manage") {
+                                router.selectedTab = .projects
+                                dismiss()
+                            }
+                            .font(.footnote.weight(.semibold))
                             .foregroundStyle(Color.amber)
+                        }
                     }
                     .listRowBackground(Color.amber.opacity(0.08))
                 }

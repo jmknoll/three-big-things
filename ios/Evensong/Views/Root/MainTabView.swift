@@ -1,31 +1,45 @@
 import SwiftUI
 
+/// Lightweight cross-tab navigation state, so nested sheets (e.g. the goal
+/// Assignment Sheet, the soft-limit sheet) can jump the user to another tab.
+final class AppRouter: ObservableObject {
+    enum Tab: Hashable { case today, projects, settings }
+    @Published var selectedTab: Tab = .today
+}
+
 struct MainTabView: View {
     @EnvironmentObject var auth: AuthViewModel
     @EnvironmentObject var todayVM: TodayViewModel
     @StateObject private var projectsVM = ProjectsViewModel()
+    @StateObject private var router = AppRouter()
 
     var body: some View {
         ZStack(alignment: .top) {
-            TabView {
+            TabView(selection: $router.selectedTab) {
                 TodayTabView()
                     .tabItem {
                         Label("Today", systemImage: "sun.max")
                     }
+                    .tag(AppRouter.Tab.today)
                     .environmentObject(todayVM)
                     .environmentObject(projectsVM)
+                    .environmentObject(router)
 
                 ProjectListView()
                     .tabItem {
                         Label("Projects", systemImage: "folder")
                     }
+                    .tag(AppRouter.Tab.projects)
                     .environmentObject(projectsVM)
+                    .environmentObject(router)
 
                 SettingsView()
                     .tabItem {
                         Label("Settings", systemImage: "slider.horizontal.3")
                     }
+                    .tag(AppRouter.Tab.settings)
                     .environmentObject(projectsVM)
+                    .environmentObject(router)
             }
             .tint(.sage)
 
